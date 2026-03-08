@@ -500,6 +500,66 @@ var settings = {
 // ============================================================
 var WEEKDAYS = ['일','월','화','수','목','금','토'];
 
+var FORTUNES = [
+  {icon:'☀️', text:'오늘은 모든 일이 술술 풀리는 날! 자신감 있게 나아가세요.'},
+  {icon:'🌸', text:'작은 친절이 큰 행운을 불러옵니다. 미소를 잊지 마세요.'},
+  {icon:'💫', text:'숨겨진 재능이 빛날 시간입니다. 새로운 도전을 두려워 말아요.'},
+  {icon:'🍀', text:'뜻밖의 기쁜 소식이 찾아올 수 있어요. 마음의 여유를 가지세요.'},
+  {icon:'🌙', text:'직감을 믿으세요. 오늘의 선택이 좋은 결과로 이어집니다.'},
+  {icon:'🔥', text:'에너지가 넘치는 날! 미뤄뒀던 일을 처리하기 딱 좋아요.'},
+  {icon:'💎', text:'노력한 만큼 정직하게 보상받는 날입니다. 꾸준히 가세요.'},
+  {icon:'🌈', text:'대인 관계에서 좋은 인연이 생깁니다. 먼저 다가가 보세요.'},
+  {icon:'⭐', text:'오늘은 집중력이 최고조! 중요한 업무를 처리하기 좋은 날.'},
+  {icon:'🌊', text:'유연하게 흘러가세요. 억지로 잡으려 하면 더 멀어집니다.'},
+  {icon:'🦋', text:'변화를 두려워 말아요. 오늘의 변화가 내일의 성장입니다.'},
+  {icon:'🌺', text:'아름다운 것에 집중하세요. 긍정 에너지가 행운을 끌어당깁니다.'},
+  {icon:'🎯', text:'목표를 정하고 한 걸음씩 나아가는 날. 포기하지 마세요.'},
+  {icon:'🏆', text:'오늘 당신은 주인공! 빛나는 하루가 될 거예요.'},
+  {icon:'🌿', text:'자연처럼 여유롭게. 서두르지 않아도 모든 것이 제때 옵니다.'},
+  {icon:'💌', text:'소중한 사람에게 연락해 보세요. 따뜻한 말 한마디가 큰 힘이 됩니다.'},
+  {icon:'🎵', text:'마음이 즐거운 날! 좋아하는 음악과 함께 하루를 시작해요.'},
+  {icon:'🌟', text:'재물운이 상승하는 날. 작은 절약도 큰 돈이 됩니다.'},
+  {icon:'🦅', text:'높은 곳을 바라보세요. 당신의 가능성은 무한합니다.'},
+  {icon:'🍵', text:'잠깐 쉬어가도 괜찮아요. 충분한 휴식이 최고의 생산성입니다.'},
+  {icon:'🌻', text:'밝은 표정이 행운을 부릅니다. 오늘 하루도 활짝 웃어봐요.'},
+  {icon:'🎀', text:'작은 것에 감사하면 더 큰 기쁨이 찾아옵니다.'},
+  {icon:'💪', text:'어떤 어려움도 이겨낼 힘이 있습니다. 오늘도 파이팅!'},
+  {icon:'🌙', text:'조용히 내면을 돌아보는 시간이 필요해요. 성찰이 답입니다.'},
+  {icon:'🎊', text:'예상치 못한 기쁜 일이 생길 수 있어요. 열린 마음으로 하루를!'},
+  {icon:'🍃', text:'가볍게 털어버리세요. 오늘은 새로운 시작의 날입니다.'},
+  {icon:'⚡', text:'영감이 넘치는 날! 번뜩이는 아이디어를 바로 메모해 두세요.'},
+  {icon:'🌹', text:'당신의 진심이 상대방에게 잘 전달됩니다. 솔직하게 말해보아요.'},
+  {icon:'🏅', text:'꾸준함이 빛을 발하는 날. 묵묵히 걸어온 길이 결실을 맺어요.'},
+  {icon:'🎈', text:'오늘만큼은 가볍고 유쾌하게! 웃음이 최고의 명약입니다.'},
+  {icon:'🌊', text:'감정의 파도에 휩쓸리지 말고 중심을 잡아요. 평정심이 승리!'},
+  {icon:'🍁', text:'변화의 계절. 놓아야 할 것은 과감히 놓아버리세요.'},
+  {icon:'💡', text:'막혔던 문제의 해답이 보입니다. 주변을 자세히 살펴보세요.'},
+  {icon:'🌙', text:'숙면을 취하세요. 좋은 꿈이 내일의 행운을 예고합니다.'},
+  {icon:'🎁', text:'기대하지 않았던 선물 같은 일이 생깁니다. 감사한 마음으로!'},
+  {icon:'🦄', text:'특별한 날입니다. 평소와 다른 선택을 해보는 건 어떨까요?'},
+  {icon:'🌸', text:'봄날처럼 따뜻한 하루. 주변에 온기를 나눠주세요.'},
+  {icon:'⛅', text:'흐리더라도 구름 뒤엔 항상 해가 있어요. 희망을 잃지 마세요.'},
+  {icon:'🎶', text:'리듬을 타듯 즐겁게! 오늘 하루가 신나는 노래가 됩니다.'},
+  {icon:'🌴', text:'여유로운 마음이 최고의 결과를 만듭니다. 힘 빼고 편하게!'},
+  {icon:'💰', text:'돈과 관련된 결정은 신중하게. 장기적 안목이 중요한 날.'},
+  {icon:'🔮', text:'직관이 날카로운 날. 첫 번째 느낌을 믿어도 좋습니다.'},
+  {icon:'🌺', text:'건강이 재산! 오늘은 몸을 잘 돌봐주세요. 수분 보충 잊지 마요.'},
+  {icon:'🎠', text:'인생을 너무 심각하게 생각하지 마요. 놀이처럼 즐겨요!'},
+  {icon:'🌍', text:'넓은 시야로 바라보세요. 당신이 생각한 것보다 더 큰 세상이 있어요.'},
+  {icon:'💝', text:'사랑을 주면 사랑이 돌아옵니다. 오늘 소중한 사람에게 표현해요.'},
+  {icon:'🏞️', text:'자연을 가까이 하세요. 짧은 산책이 큰 활력을 줍니다.'},
+  {icon:'⚓', text:'흔들리지 마세요. 당신의 중심이 바로 서 있으면 어떤 파도도 문제없어요.'},
+  {icon:'🎯', text:'한 가지에 집중하는 날. 멀티태스킹보다 한 우물을 깊이 파세요.'},
+  {icon:'🌠', text:'소원을 품으세요. 강하게 원하면 이루어집니다. 오늘이 그 날!'}
+];
+
+function getTodayFortune() {
+  var d = new Date();
+  var seed = d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+  var idx = seed % FORTUNES.length;
+  return FORTUNES[idx];
+}
+
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
 }
@@ -553,7 +613,16 @@ function payMethodBadge(pm) {
 }
 function isRevenu(b) {
   if (b.status !== 'done') return false;
+  // ticketId 있으면 이용권 차감 → 매출 제외
   if (b.ticketId) return false;
+  // type이 이용권차감이면 제외 (ticketId 유실된 기존 데이터 대비)
+  if (b.type === '이용권차감') return false;
+  // ticketHistory에 bookingId로 등록된 경우 = 이용권 차감 시술 → 제외
+  if (b.id) {
+    for (var i = 0; i < ticketHistory.length; i++) {
+      if (ticketHistory[i].bookingId === b.id) return false;
+    }
+  }
   var s = (b.service || '').trim();
   if (s.indexOf('회원권') !== -1) return false;
   return true;
@@ -690,8 +759,16 @@ function renderHome() {
   var birthdays = getBirthdays7();
 
   var html = '';
+  var fortune = getTodayFortune();
   html += '<div class="tab-header"><h1>' + esc(settings.shopName) + '</h1>';
-  html += '<div class="header-right"><span style="font-size:12px;color:var(--text2);">' + esc(settings.greeting) + '</span></div></div>';
+  html += '<div class="header-right"></div></div>';
+  // 오늘의 운세 배너
+  html += '<div style="margin:0 16px 12px;background:linear-gradient(135deg,#fff9e6,#fff3c4);border:1px solid #fde68a;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;">';
+  html += '<div style="font-size:26px;line-height:1;">' + fortune.icon + '</div>';
+  html += '<div style="flex:1;">';
+  html += '<div style="font-size:10px;font-weight:700;color:#92400e;letter-spacing:0.05em;margin-bottom:2px;">✨ 오늘의 운세</div>';
+  html += '<div style="font-size:13px;color:#78350f;font-weight:500;line-height:1.4;">' + esc(fortune.text) + '</div>';
+  html += '</div></div>';
   html += '<div class="tab-content">';
 
   // 통계 카드
@@ -1743,7 +1820,7 @@ function doDeduct(ticketId) {
     id: uid(), date: todayStr(), time: '', name: t.memberName, phone: '',
     service: serviceName, price: t.type==='money' ? amount : 0,
     payMethod: '', status: 'done', ticketId: ticketId,
-    type: '시술 매출', memo: '', duration: 0, source: ''
+    type: '이용권차감', memo: '', duration: 0, source: ''
   };
   bookings.push(bookingRecord);
 
@@ -2603,6 +2680,19 @@ function registerSW() {
 // ============================================================
 function init() {
   loadData();
+  // ★ 기존 손상 데이터 복구: ticketHistory에 있는 bookingId의 booking이
+  //    ticketId=null 로 저장돼 있으면 복구
+  var repaired = false;
+  ticketHistory.forEach(function(h){
+    if (!h.bookingId) return;
+    var b = bookings.find(function(x){ return x.id === h.bookingId; });
+    if (b && !b.ticketId) {
+      b.ticketId = h.ticketId;
+      b.type = '이용권차감';
+      repaired = true;
+    }
+  });
+  if (repaired) saveData();
   var now = new Date();
   calYear = now.getFullYear();
   calMonth = now.getMonth();
