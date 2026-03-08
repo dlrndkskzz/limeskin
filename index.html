@@ -1423,8 +1423,7 @@ function openBookingModal(id, defaultDate) {
 
   document.getElementById('modal-booking-body').innerHTML = html;
   openModal('modal-booking');
-  // 이미 이용권+완료 상태인 경우 차감 섹션 즉시 표시
-  onBookingTicketOrStatusChange();
+  setTimeout(function(){ onBookingTicketOrStatusChange(); }, 50);
 }
 
 function buildTicketOptions(name, phone, selectedId) {
@@ -1481,17 +1480,13 @@ function onBookingTicketOrStatusChange() {
 
   var html = '';
 
-  if (existingDeduct) {
-    // 이미 차감된 경우 → 차감 내역만 표시
+  if (existingDeduct && t.type === 'count') {
+    // 횟수권이고 이미 차감된 경우 → 완료 표시만
     html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;">';
     html += '<span style="font-size:20px;">✅</span>';
     html += '<div>';
     html += '<div style="font-size:12px;font-weight:700;color:var(--primary-dark);">이미 차감 완료</div>';
-    if (t.type === 'count') {
-      html += '<div style="font-size:12px;color:var(--text2);">차감: ' + existingDeduct.amount + '회 · 잔여: ' + t.remain + '회</div>';
-    } else {
-      html += '<div style="font-size:12px;color:var(--text2);">차감: ' + fmtMoney(existingDeduct.amount) + ' · 잔여: ' + fmtMoney(t.remain) + '</div>';
-    }
+    html += '<div style="font-size:12px;color:var(--text2);">차감: ' + existingDeduct.amount + '회 · 잔여: ' + t.remain + '회</div>';
     html += '</div></div>';
   } else if (t.type === 'count') {
     // 횟수권: 잔여 + 1~5회 선택
