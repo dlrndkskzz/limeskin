@@ -26620,16 +26620,26 @@ body { max-width: 480px; margin: 0 auto; position: relative; overflow-x: hidden;
     </div>
     <div class="form-group">
       <label class="form-label">발송 대상</label>
-      <select id="bulk-target" class="form-select" onchange="renderBulkPreview()">
+      <select id="bulk-target" class="form-select" onchange="onBulkTargetChange()">
         <option value="all">전체 회원</option>
         <option value="ticket">이용권 보유 회원</option>
         <option value="inactive">1개월 미방문</option>
         <option value="birthday">이번달 생일자</option>
+        <option value="custom">🔍 직접 검색/선택</option>
       </select>
+    </div>
+    <!-- 직접 검색 영역 -->
+    <div id="bulk-search-area" style="display:none;margin-bottom:12px;">
+      <div style="position:relative;margin-bottom:8px;">
+        <input type="text" id="bulk-search-input" class="form-input" placeholder="이름 또는 전화번호 검색..." oninput="renderBulkSearch()" style="padding-right:36px;">
+        <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px;">🔍</span>
+      </div>
+      <div id="bulk-search-results" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;background:#fff;"></div>
+      <div id="bulk-selected-members" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;"></div>
     </div>
     <div class="form-group">
       <label class="form-label">메시지 내용</label>
-      <textarea id="bulk-text" class="form-textarea" rows="5" placeholder="발송할 메시지를 입력하세요..."></textarea>
+      <textarea id="bulk-text" class="form-textarea" rows="5" placeholder="발송할 메시지를 입력하세요&#10;{이름} 으로 개인화 가능해요"></textarea>
     </div>
     <div class="card" id="bulk-preview" style="margin-bottom:12px;"></div>
     <button class="btn btn-primary btn-block" onclick="sendBulkMessage()">📤 발송하기</button>
@@ -26966,6 +26976,7 @@ function getTicketById(id) {
 
 function isRevenu(b) {
   if (b.status !== 'done') return false;
+  // 이용권 차감 예약은 이미 받은 돈 → 매출 제외
   if (b.ticketId) return false;
   var s = (b.service || '').trim();
   if (s.includes('만원권')) return false;
@@ -26981,11 +26992,55 @@ function renderHome() {
   var now = new Date();
   var thisMonth = now.getFullYear() + '-' + pad2(now.getMonth()+1);
 
-  // Greeting
+  // 오늘의 운세 (날짜 기반으로 매일 변경)
+  var FORTUNES = [
+    '🌟 오늘은 새로운 인연이 찾아올 날이에요. 웃는 얼굴로 맞이해보세요!',
+    '💚 꾸준함이 빛을 발하는 날! 오늘의 노력은 반드시 결실을 맺어요.',
+    '🍀 작은 친절 하나가 큰 행운을 불러와요. 따뜻한 하루 보내세요!',
+    '✨ 오늘은 직감을 믿어보세요. 당신의 선택이 옳을 거예요.',
+    '🌸 봄날처럼 화사한 에너지가 넘치는 날! 주변에 밝은 기운을 나눠요.',
+    '🌙 차분하게 집중하는 날이에요. 꼼꼼함이 좋은 결과를 만들어줘요.',
+    '🔮 뜻밖의 좋은 소식이 기다리고 있어요. 긍정적인 마음을 유지해요!',
+    '💫 오늘은 몸과 마음을 충전하는 날. 잠깐의 여유가 큰 힘이 돼요.',
+    '🌿 자연의 기운이 가득한 날! 건강과 활력이 넘치는 하루예요.',
+    '⭐ 오랫동안 기다리던 일이 해결되는 실마리가 보일 거예요.',
+    '🎯 집중력이 최고조인 날! 미뤄뒀던 일을 처리하기 딱 좋아요.',
+    '🌈 다양한 사람들과의 만남이 즐거운 하루예요. 대화에서 힌트를 얻어요.',
+    '💎 노력의 가치가 인정받는 날이에요. 자신감을 가지고 나아가세요!',
+    '🦋 변화를 두려워하지 말아요. 오늘의 도전이 내일의 성장이 돼요.',
+    '🌺 감사한 마음이 더 큰 행복을 끌어당겨요. 주변을 돌아봐요.',
+    '🔆 밝고 긍정적인 에너지로 주변까지 빛나게 하는 날이에요!',
+    '🍃 단순하게 생각하면 답이 보여요. 복잡한 것은 내려놓아요.',
+    '💝 인간관계에서 따뜻함이 돌아오는 날. 먼저 마음을 열어보세요.',
+    '🌊 큰 흐름을 타는 날! 타이밍을 잘 잡으면 좋은 일이 생겨요.',
+    '🏆 오늘 하루 최선을 다하면 충분해요. 당신은 이미 잘 하고 있어요!',
+    '🌻 따뜻한 햇살처럼 밝은 기운이 가득한 날이에요. 활짝 웃어요!',
+    '🎋 인내가 빛을 발하는 날. 조금만 더 힘을 내면 원하는 걸 얻어요.',
+    '🍯 달콤한 결과가 기다리는 날! 오늘의 수고가 헛되지 않아요.',
+    '🌙 조용한 곳에서 아이디어가 떠오르는 날. 메모해두는 걸 잊지 마요.',
+    '🎠 즐거운 일이 예상치 못한 곳에서 찾아와요. 열린 마음을 가져요.',
+    '💪 체력과 의지력이 충만한 날! 어떤 어려움도 거뜬히 이겨낼 수 있어요.',
+    '🌱 씨앗을 심는 날이에요. 지금의 작은 노력이 큰 나무가 돼요.',
+    '🎵 리듬감 있게 하루를 보내면 효율이 두 배! 즐겁게 일해요.',
+    '🦄 특별한 하루가 펼쳐질 것 같은 예감! 기대를 품고 시작해요.',
+    '🌟 오늘은 당신이 주인공이에요. 자신을 믿고 당당하게 빛나세요!'
+  ];
+
+  // 날짜 기반 시드로 매일 다른 운세
+  var dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+  var fortuneIdx = (dayOfYear + now.getFullYear()) % FORTUNES.length;
+  var fortune = FORTUNES[fortuneIdx];
+
   var h = now.getHours();
-  var greet = h < 12 ? '좋은 아침이에요!' : h < 18 ? '좋은 오후예요!' : '좋은 저녁이에요!';
+  var timeGreet = h < 12 ? '좋은 아침이에요, 원장님! ☀️' : h < 18 ? '좋은 오후예요, 원장님! 🌿' : '수고 많으셨어요, 원장님! 🌙';
+
   var greeting = document.getElementById('home-greeting');
-  greeting.innerHTML = '<strong>' + fmtDateFull(today) + ' ' + WEEKDAYS[now.getDay()] + '요일</strong><br>' + (settings.greeting || greet);
+  greeting.innerHTML =
+    '<div style="font-size:13px;font-weight:600;color:var(--primary-dark);margin-bottom:6px;">' + fmtDateFull(today) + ' ' + WEEKDAYS[now.getDay()] + '요일 · ' + timeGreet + '</div>' +
+    '<div style="background:linear-gradient(135deg,var(--primary-pale),#f0faf0);border-radius:12px;padding:12px 14px;border-left:3px solid var(--primary);">' +
+      '<div style="font-size:11px;font-weight:700;color:var(--primary-dark);margin-bottom:4px;">🔮 오늘의 운세</div>' +
+      '<div style="font-size:13px;color:var(--text);line-height:1.6;">' + fortune + '</div>' +
+    '</div>';
 
   // Stats
   var todayB = bookings.filter(function(b) { return b.date === today && b.status !== 'cancelled'; });
@@ -27031,11 +27086,34 @@ function renderHome() {
   }
 }
 
+function getMemberByName(name, phone) {
+  if (!name) return null;
+  // 이름+전화 매칭
+  for (var i = 0; i < members.length; i++) {
+    if (members[i].name === name && phone && members[i].phone === phone) return members[i];
+  }
+  // 이름만 매칭
+  for (var i = 0; i < members.length; i++) {
+    if (members[i].name === name) return members[i];
+  }
+  return null;
+}
+
+function openMemberByName(name, phone) {
+  var m = getMemberByName(name, phone);
+  if (m) { openMemberDetail(m.id); return; }
+  showToast('회원 정보가 없습니다');
+}
+
 function bookingItemHTML(b) {
+  var m = getMemberByName(b.name, b.phone);
+  var nameHtml = m ?
+    '<span class="name" onclick="event.stopPropagation();openMemberDetail(\''+m.id+'\')" style="color:var(--primary-dark);text-decoration:underline;text-decoration-color:var(--primary-light);cursor:pointer;">'+b.name+'</span>' :
+    '<span class="name">'+b.name+'</span>';
   return '<div class="booking-item" onclick="openBookingModal(\''+b.id+'\')">' +
     '<div class="time-badge">'+(b.time||'--:--')+'</div>' +
     '<div class="info">' +
-      '<div class="name">'+b.name+'</div>' +
+      nameHtml +
       '<div class="detail">'+b.service+(b.price?' · ₩'+fmtMoney(b.price):'')+(b.ticketId?' · 🎫이용권':'')+'</div>' +
     '</div>' +
     '<span class="status status-'+b.status+'">'+statusLabel(b.status)+'</span>' +
@@ -28388,12 +28466,16 @@ function buildDetailRows(bList) {
 
     var svcShort = (b.service||'').length > 18 ? (b.service||'').substr(0,18)+'…' : (b.service||'-');
 
+    var memberLink = getMemberByName(b.name, b.phone);
+    var nameHtmlDR = memberLink ?
+      '<span onclick="openMemberDetail(\'' + memberLink.id + '\')" style="color:var(--primary-dark);text-decoration:underline;text-decoration-color:var(--primary-light);cursor:pointer;">' + b.name + '</span>' :
+      b.name;
     html += '<div style="display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid var(--border);background:'+rowBg+';gap:8px;">' +
       '<div style="min-width:38px;text-align:center;background:var(--primary-pale);border-radius:6px;padding:4px 2px;">' +
         '<div style="font-size:12px;font-weight:700;color:var(--primary-dark);">'+(b.time||'--:--')+'</div>' +
       '</div>' +
       '<div style="flex:1;min-width:0;">' +
-        '<div style="font-size:13px;font-weight:700;">'+b.name+typeBadge+'</div>' +
+        '<div style="font-size:13px;font-weight:700;">' + nameHtmlDR + typeBadge + '</div>' +
         '<div style="font-size:11px;color:var(--text3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+svcShort+'</div>' +
       '</div>' +
       '<div style="text-align:right;flex-shrink:0;">' +
@@ -28406,12 +28488,94 @@ function buildDetailRows(bList) {
   return html;
 }
 
-function renderBulkPreview() {
+var bulkSelectedIds = [];
+
+function onBulkTargetChange() {
+  var val = document.getElementById('bulk-target').value;
+  var searchArea = document.getElementById('bulk-search-area');
+  if (val === 'custom') {
+    searchArea.style.display = 'block';
+    bulkSelectedIds = [];
+    renderBulkSearch();
+    renderBulkSelectedChips();
+  } else {
+    searchArea.style.display = 'none';
+  }
+  renderBulkPreview();
+}
+
+function renderBulkSearch() {
+  var q = (document.getElementById('bulk-search-input').value || '').trim().toLowerCase();
+  var resultsEl = document.getElementById('bulk-search-results');
+  if (!q) {
+    resultsEl.innerHTML = '<div style="padding:10px;text-align:center;font-size:12px;color:var(--text3);">이름 또는 전화번호를 입력하세요</div>';
+    return;
+  }
+  var filtered = members.filter(function(m) {
+    return m.name.toLowerCase().includes(q) || (m.phone && m.phone.replace(/[^0-9]/g,'').includes(q.replace(/[^0-9]/g,'')));
+  }).slice(0, 10);
+
+  if (!filtered.length) {
+    resultsEl.innerHTML = '<div style="padding:10px;text-align:center;font-size:12px;color:var(--text3);">검색 결과 없음</div>';
+    return;
+  }
+
+  resultsEl.innerHTML = filtered.map(function(m) {
+    var selected = bulkSelectedIds.indexOf(m.id) >= 0;
+    return '<div onclick="toggleBulkMember(\'' + m.id + '\')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;background:' + (selected ? 'var(--primary-pale)' : '#fff') + ';">' +
+      '<div style="width:22px;height:22px;border-radius:50%;background:' + (selected ? 'var(--primary)' : 'var(--border)') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+        '<span style="color:#fff;font-size:13px;">' + (selected ? '✓' : '') + '</span>' +
+      '</div>' +
+      '<div>' +
+        '<div style="font-size:13px;font-weight:600;">' + m.name + '</div>' +
+        '<div style="font-size:11px;color:var(--text3);">' + (m.phone || '번호없음') + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleBulkMember(mid) {
+  var idx = bulkSelectedIds.indexOf(mid);
+  if (idx >= 0) bulkSelectedIds.splice(idx, 1);
+  else bulkSelectedIds.push(mid);
+  renderBulkSearch();
+  renderBulkSelectedChips();
+  renderBulkPreview();
+}
+
+function removeBulkMember(mid) {
+  var idx = bulkSelectedIds.indexOf(mid);
+  if (idx >= 0) bulkSelectedIds.splice(idx, 1);
+  renderBulkSearch();
+  renderBulkSelectedChips();
+  renderBulkPreview();
+}
+
+function renderBulkSelectedChips() {
+  var el = document.getElementById('bulk-selected-members');
+  if (!el) return;
+  if (!bulkSelectedIds.length) {
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML = '<div style="font-size:11px;color:var(--text3);margin-bottom:4px;width:100%;">선택된 ' + bulkSelectedIds.length + '명:</div>' +
+    bulkSelectedIds.map(function(id) {
+      var m = getMemberById(id);
+      if (!m) return '';
+      return '<span style="background:var(--primary);color:#fff;border-radius:20px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:4px;">' +
+        m.name +
+        '<span onclick="removeBulkMember(\'' + id + '\')" style="cursor:pointer;font-size:14px;opacity:0.8;margin-left:2px;">×</span>' +
+      '</span>';
+    }).join('');
+}
+
+function getBulkTargets() {
   var target = document.getElementById('bulk-target').value;
-  var today = todayStr();
   var now = new Date();
   var thisMo = pad2(now.getMonth()+1);
-
+  if (target === 'custom') {
+    return members.filter(function(m) { return bulkSelectedIds.indexOf(m.id) >= 0; });
+  }
   var targets = members;
   if (target === 'ticket') targets = members.filter(function(m) { return tickets.some(function(t) { return t.memberId === m.id && !t.closed && t.remain > 0; }); });
   if (target === 'inactive') {
@@ -28420,7 +28584,11 @@ function renderBulkPreview() {
     targets = members.filter(function(m) { return !m.lastVisit || m.lastVisit < cutoff; });
   }
   if (target === 'birthday') targets = members.filter(function(m) { return m.birth && m.birth.startsWith(thisMo+'-'); });
+  return targets;
+}
 
+function renderBulkPreview() {
+  var targets = getBulkTargets();
   document.getElementById('bulk-preview').innerHTML =
     '<div style="font-size:13px;font-weight:700;margin-bottom:6px;">발송 대상: ' + targets.length + '명</div>' +
     '<div style="font-size:12px;color:var(--text3);">' +
@@ -28438,19 +28606,7 @@ function setBulkType(type, el) {
 function sendBulkMessage() {
   var text = document.getElementById('bulk-text').value.trim();
   if (!text) { showToast('메시지를 입력해주세요'); return; }
-  var target = document.getElementById('bulk-target').value;
-  var now = new Date();
-  var thisMo = pad2(now.getMonth()+1);
-
-  var targets = members;
-  if (target === 'ticket') targets = members.filter(function(m) { return tickets.some(function(t) { return t.memberId === m.id && !t.closed && t.remain > 0; }); });
-  if (target === 'inactive') {
-    var oneMonthAgo = new Date(now.getTime() - 30*86400000);
-    var cutoff = oneMonthAgo.getFullYear() + '-' + pad2(oneMonthAgo.getMonth()+1) + '-' + pad2(oneMonthAgo.getDate());
-    targets = members.filter(function(m) { return !m.lastVisit || m.lastVisit < cutoff; });
-  }
-  if (target === 'birthday') targets = members.filter(function(m) { return m.birth && m.birth.startsWith(thisMo+'-'); });
-
+  var targets = getBulkTargets();
   if (!targets.length) { showToast('발송 대상이 없습니다'); return; }
   showToast(targets.length + '명에게 발송을 시작합니다...');
 
