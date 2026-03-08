@@ -120,6 +120,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none;}
 
 /* ===== 서브 패널 ===== */
 .sub-panel{position:fixed;top:0;right:-100%;width:100%;max-width:480px;height:100%;background:var(--bg);z-index:500;transition:right 0.3s ease;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#panel-member-detail{z-index:520;}
 .sub-panel.open{right:0;}
 .sub-panel-header{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:10px;z-index:10;}
 .sub-panel-header h2{flex:1;font-size:17px;font-weight:700;}
@@ -1502,7 +1503,9 @@ function saveBooking() {
     var idx = bookings.findIndex(function(x){ return x.id === bookingEditId; });
     if (idx !== -1) {
       prevStatus = bookings[idx].status;
-      bookings[idx] = Object.assign(bookings[idx], {date,time,name,phone,service,price,payMethod,ticketId,status,source,memo,duration});
+      // ticketId 보존: 드롭다운 값이 있으면 그걸 쓰고, 없으면 기존값 유지
+      var finalTicketId = ticketSelVal || bookings[idx].ticketId || null;
+      bookings[idx] = Object.assign(bookings[idx], {date,time,name,phone,service,price,payMethod,ticketId:finalTicketId,status,source,memo,duration});
     }
   } else {
     bookings.push({
