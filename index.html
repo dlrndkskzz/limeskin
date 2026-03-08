@@ -1763,6 +1763,16 @@ function openDeductModal(ticketId) {
   html += t.type === 'money' ? fmtMoney(t.remain) : t.remain + '회';
   html += '</div></div>';
 
+  // ★ 날짜 선택
+  html += '<div class="form-group"><label class="form-label">시술 날짜</label>';
+  html += '<input class="form-input" type="date" id="d-date" value="' + todayStr() + '" onchange="refreshDeductBookingList(\'' + t.memberName + '\',\'' + t.memberId + '\')"></div>';
+
+  // ★ 기존 예약 연결 (해당 날짜 예약 목록)
+  html += '<div class="form-group" id="d-booking-link-wrap">';
+  html += '<label class="form-label">기존 예약에 연결 <span style="font-size:11px;color:var(--text3);">(선택하면 예약도 자동 완료 처리)</span></label>';
+  html += '<div id="d-booking-list">' + buildDeductBookingList(t.memberName, t.memberId, todayStr()) + '</div>';
+  html += '</div>';
+
   if (t.type === 'money') {
     html += '<div class="form-group"><label class="form-label">서비스 금액</label><input class="form-input" type="number" id="d-service-price" placeholder="80000" oninput="calcDeductAmount()"></div>';
     html += '<div class="form-group"><label class="form-label">할인 방식</label>';
@@ -1782,17 +1792,49 @@ function openDeductModal(ticketId) {
   services.forEach(function(s){ serviceListHtml += '<option value="' + esc(s.name) + '">'; });
   serviceListHtml += '</datalist>';
   html += serviceListHtml;
-  document.getElementById('d-service-name') && (document.getElementById('d-service-name').setAttribute('list','service-list'));
 
   html += '<button class="btn btn-block btn-primary" onclick="doDeduct(\'' + ticketId + '\')">차감하기</button>';
 
   document.getElementById('modal-deduct-body').innerHTML = html;
-  // datalist 연결
   setTimeout(function(){
     var inp = document.getElementById('d-service-name');
     if (inp) inp.setAttribute('list','service-list');
   }, 50);
   openModal('modal-deduct');
+}
+
+// 선택된 날짜의 해당 회원 예약 목록 빌드
+function buildDeductBookingList(memberName, memberId, dateStr) {
+  // 해당 날짜, 해당 회원, 아직 ticketId 없는 예약
+  var candidates = bookings.filter(function(b){
+    return b.date === dateStr
+      && (b.name === memberName || (memberId && b.memberId === memberId))
+      && !b.ticketId
+      && b.status !== 'cancelled';
+  });
+  if (candidates.length === 0) {
+    return '<div style="font-size:12px;color:var(--text3);padding:8px;background:var(--bg);border-radius:8px;">이 날 예약 없음 — 차감 시 새 내역 자동 생성</div>';
+  }
+  var html = '<div style="display:flex;flex-direction:column;gap:6px;">';
+  html += '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;">';
+  html += '<input type="radio" name="d-booking-sel" value="" checked> <span style="color:var(--text2);">연결 안 함 (새 내역 생성)</span>';
+  html += '</label>';
+  candidates.forEach(function(b){
+    var statusTxt = b.status === 'done' ? '완료' : '예약확정';
+    html += '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid var(--primary-light);border-radius:8px;background:var(--primary-pale);font-size:13px;cursor:pointer;">';
+    html += '<input type="radio" name="d-booking-sel" value="' + b.id + '">';
+    html += '<span><strong>' + esc(b.time||'시간미정') + '</strong> ' + esc(b.service||'') + ' <span style="color:var(--text2);">(' + statusTxt + ')</span></span>';
+    html += '</label>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function refreshDeductBookingList(memberName, memberId) {
+  var dateEl = document.getElementById('d-date');
+  var listEl = document.getElementById('d-booking-list');
+  if (!dateEl || !listEl) return;
+  listEl.innerHTML = buildDeductBookingList(memberName, memberId, dateEl.value);
 }
 
 function calcDeductAmount() {
@@ -1812,6 +1854,9 @@ function doDeduct(ticketId) {
   var serviceName = (document.getElementById('d-service-name')||{}).value || '';
   if (!serviceName) { showToast('서비스명을 입력해주세요'); return; }
 
+  var dateEl = document.getElementById('d-date');
+  var deductDate = dateEl ? dateEl.value : todayStr();
+
   var amount, newRemain;
   if (t.type === 'money') {
     amount = parseInt((document.getElementById('d-actual-amount')||{}).value||'0') || parseInt((document.getElementById('d-service-price')||{}).value||'0') || 0;
@@ -1822,17 +1867,40 @@ function doDeduct(ticketId) {
     newRemain = t.remain - amount;
   }
 
-  var bookingRecord = {
-    id: uid(), date: todayStr(), time: '', name: t.memberName, phone: '',
-    service: serviceName, price: t.type==='money' ? amount : 0,
-    payMethod: '', status: 'done', ticketId: ticketId,
-    type: '이용권차감', memo: '', duration: 0, source: ''
-  };
-  bookings.push(bookingRecord);
+  // ★ 기존 예약 연결 여부 확인
+  var linkedBookingId = '';
+  var radios = document.querySelectorAll('input[name="d-booking-sel"]');
+  for (var r = 0; r < radios.length; r++) {
+    if (radios[r].checked) { linkedBookingId = radios[r].value; break; }
+  }
+
+  var bookingId;
+  if (linkedBookingId) {
+    // ★ 기존 예약에 ticketId 연결 + 완료 처리
+    var existing = bookings.find(function(x){ return x.id === linkedBookingId; });
+    if (existing) {
+      existing.ticketId = ticketId;
+      existing.type = '이용권차감';
+      existing.status = 'done';
+      existing.service = serviceName || existing.service;
+      if (t.type === 'money') existing.price = amount;
+      bookingId = existing.id;
+    }
+  } else {
+    // 새 booking 생성
+    var bookingRecord = {
+      id: uid(), date: deductDate, time: '', name: t.memberName, phone: '',
+      service: serviceName, price: t.type==='money' ? amount : 0,
+      payMethod: 'ticket', status: 'done', ticketId: ticketId,
+      type: '이용권차감', memo: '', duration: 0, source: ''
+    };
+    bookings.push(bookingRecord);
+    bookingId = bookingRecord.id;
+  }
 
   // 히스토리
   ticketHistory.push({
-    ticketId, bookingId: bookingRecord.id, date: todayStr(),
+    ticketId: ticketId, bookingId: bookingId, date: deductDate,
     servicePrice: amount, discount: 0, amount: amount,
     remain: Math.max(0, newRemain), reason: serviceName
   });
@@ -1845,12 +1913,12 @@ function doDeduct(ticketId) {
   var m = members.find(function(x){ return x.id === t.memberId; });
   if (m) {
     m.visitCount = (m.visitCount||0) + 1;
-    m.lastVisit = todayStr();
+    m.lastVisit = deductDate;
   }
 
   saveData();
   closeModal('modal-deduct');
-  showToast('차감되었습니다 (잔여: ' + (t.type==='money' ? fmtMoney(t.remain) : t.remain+'회') + ')');
+  showToast('차감되었습니다 (잔여: ' + (t.type==='money' ? fmtMoney(t.remain) : t.remain+'회') + ')' + (linkedBookingId ? ' — 예약 연결 완료' : ''));
 
   // 알림톡
   sendAlimtalk('deduct', {name: t.memberName, remain: t.remain, type: t.type});
