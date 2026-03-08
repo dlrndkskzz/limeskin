@@ -1398,10 +1398,17 @@ function openBookingModal(id, defaultDate) {
   html += '<div id="b-price-hint" style="display:none;" class="hint-badge" onclick="saveServicePriceHint()">💡 이 금액을 기본으로 저장할까요?</div></div>';
   html += '<div class="form-group"><label class="form-label">결제수단</label>' + payBtns + '</div>';
   html += '<div class="form-group"><label class="form-label">이용권</label>';
-  html += '<select class="form-input" id="b-ticket">' + ticketOptions + '</select>';
+  html += '<select class="form-input" id="b-ticket" onchange="onBookingTicketOrStatusChange()">' + ticketOptions + '</select>';
   html += '<input type="hidden" id="b-ticketid-orig" value="' + esc(ticketId||'') + '"></div>';
   html += '<div class="form-group"><label class="form-label">상태</label>';
-  html += '<select class="form-input" id="b-status"><option value="confirmed"' + (status==='confirmed'?' selected':'') + '>예약확정</option><option value="done"' + (status==='done'?' selected':'') + '>완료</option><option value="cancelled"' + (status==='cancelled'?' selected':'') + '>취소</option></select></div>';
+  html += '<select class="form-input" id="b-status" onchange="onBookingTicketOrStatusChange()"><option value="confirmed"' + (status==='confirmed'?' selected':'') + '>예약확정</option><option value="done"' + (status==='done'?' selected':'') + '>완료</option><option value="cancelled"' + (status==='cancelled'?' selected':'') + '>취소</option></select></div>';
+
+  // ★ 이용권 차감 입력 영역 (이용권 선택 + 완료 상태일 때만 표시)
+  html += '<div id="b-deduct-section" style="display:none;">';
+  html += '<div style="background:var(--primary-pale);border:1.5px solid var(--primary-light);border-radius:10px;padding:12px;margin-bottom:8px;">';
+  html += '<div style="font-size:12px;font-weight:700;color:var(--primary-dark);margin-bottom:8px;">🎫 이용권 차감</div>';
+  html += '<div id="b-deduct-body"></div>';
+  html += '</div></div>';
   html += '<div class="form-group"><label class="form-label">유입경로</label>';
   html += '<select class="form-input" id="b-source"><option value="">선택</option><option value="naver"' + (source==='naver'?' selected':'') + '>네이버</option><option value="kakao"' + (source==='kakao'?' selected':'') + '>카카오</option><option value="phone"' + (source==='phone'?' selected':'') + '>전화</option><option value="walk"' + (source==='walk'?' selected':'') + '>워크인</option><option value="direct"' + (source==='direct'?' selected':'') + '>직접</option></select></div>';
   html += '<div class="form-group"><label class="form-label">메모</label><textarea class="form-input" id="b-memo" rows="2" placeholder="메모">' + esc(memo) + '</textarea></div>';
@@ -1416,6 +1423,8 @@ function openBookingModal(id, defaultDate) {
 
   document.getElementById('modal-booking-body').innerHTML = html;
   openModal('modal-booking');
+  // 이미 이용권+완료 상태인 경우 차감 섹션 즉시 표시
+  onBookingTicketOrStatusChange();
 }
 
 function buildTicketOptions(name, phone, selectedId) {
@@ -1441,6 +1450,73 @@ function buildTicketOptions(name, phone, selectedId) {
     }
   }
   return opts;
+}
+
+// ★ 이용권 선택 or 상태 변경 시 차감 입력 영역 갱신
+function onBookingTicketOrStatusChange() {
+  var ticketSel = document.getElementById('b-ticket');
+  var statusSel = document.getElementById('b-status');
+  var section = document.getElementById('b-deduct-section');
+  var body = document.getElementById('b-deduct-body');
+  if (!ticketSel || !statusSel || !section || !body) return;
+
+  var tId = ticketSel.value;
+  var st = statusSel.value;
+
+  if (!tId || st !== 'done') {
+    section.style.display = 'none';
+    return;
+  }
+
+  var t = tickets.find(function(x){ return x.id === tId; });
+  if (!t) { section.style.display = 'none'; return; }
+
+  section.style.display = 'block';
+
+  var html = '';
+  if (t.type === 'count') {
+    // 횟수권: 잔여 표시 + 1~5(최대 잔여) 선택
+    var maxSel = Math.min(5, t.remain);
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">';
+    html += '<span style="font-size:12px;color:var(--text2);">잔여 <strong style="color:var(--primary-dark);">' + t.remain + '회</strong></span>';
+    html += '</div>';
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+    for (var i = 1; i <= maxSel; i++) {
+      var active = i === 1 ? 'btn-primary' : 'btn-outline';
+      html += '<button type="button" class="btn btn-sm ' + active + '" id="b-deduct-count-' + i + '" onclick="selectDeductCount(' + i + ',' + maxSel + ')">' + i + '회</button>';
+    }
+    html += '</div>';
+    html += '<input type="hidden" id="b-deduct-count-val" value="1">';
+    html += '<div style="font-size:11px;color:var(--text2);margin-top:6px;">차감 후 잔여: <strong id="b-deduct-after">' + (t.remain - 1) + '회</strong></div>';
+  } else {
+    // 금액권: 잔여 표시 + 금액 직접 입력
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
+    html += '<span style="font-size:12px;color:var(--text2);">잔여 <strong style="color:var(--primary-dark);">' + fmtMoney(t.remain) + '</strong></span>';
+    html += '</div>';
+    html += '<div class="form-group" style="margin-bottom:6px;"><label class="form-label" style="font-size:12px;">차감 금액 (원)</label>';
+    html += '<input class="form-input" type="number" id="b-deduct-amount-val" placeholder="0" oninput="onDeductAmountInput(' + t.remain + ')" style="font-weight:700;">';
+    html += '</div>';
+    html += '<div style="font-size:11px;color:var(--text2);">차감 후 잔여: <strong id="b-deduct-after">' + fmtMoney(t.remain) + '</strong></div>';
+  }
+  body.innerHTML = html;
+}
+
+function selectDeductCount(n, max) {
+  document.getElementById('b-deduct-count-val').value = n;
+  for (var i = 1; i <= max; i++) {
+    var btn = document.getElementById('b-deduct-count-' + i);
+    if (btn) btn.className = 'btn btn-sm ' + (i === n ? 'btn-primary' : 'btn-outline');
+  }
+  var tId = document.getElementById('b-ticket').value;
+  var t = tickets.find(function(x){ return x.id === tId; });
+  if (t) document.getElementById('b-deduct-after').textContent = (t.remain - n) + '회';
+}
+
+function onDeductAmountInput(remain) {
+  var el = document.getElementById('b-deduct-amount-val');
+  var val = parseInt((el && el.value) || '0') || 0;
+  var after = document.getElementById('b-deduct-after');
+  if (after) after.textContent = fmtMoney(Math.max(0, remain - val));
 }
 
 function renderPayMethodBtns(selected, ctx) {
@@ -1547,6 +1623,7 @@ function getBookingPayMethod() {
   if (active.classList.contains('card')) return 'card';
   if (active.classList.contains('cash')) return 'cash';
   if (active.classList.contains('transfer')) return 'transfer';
+  if (active.classList.contains('ticket')) return 'ticket';
   return '';
 }
 
@@ -1581,6 +1658,7 @@ function saveBooking() {
 
   var isNew = !bookingEditId;
   var prevStatus = null;
+  var savedBookingId = null;
 
   if (bookingEditId) {
     var idx = bookings.findIndex(function(x){ return x.id === bookingEditId; });
@@ -1589,20 +1667,59 @@ function saveBooking() {
       // ticketId 보존: 드롭다운 값이 있으면 그걸 쓰고, 없으면 기존값 유지
       var finalTicketId = ticketSelVal || bookings[idx].ticketId || null;
       bookings[idx] = Object.assign(bookings[idx], {date,time,name,phone,service,price,payMethod,ticketId:finalTicketId,status,source,memo,duration});
+      savedBookingId = bookingEditId;
     }
   } else {
-    bookings.push({
+    var newBk = {
       id: uid(), date, time, name, phone, service, price, payMethod,
       ticketId: ticketId || null, status, source, memo, duration,
-      type: '시술 매출'
-    });
+      type: ticketId ? '이용권차감' : '시술 매출'
+    };
+    bookings.push(newBk);
+    savedBookingId = newBk.id;
   }
+
+  // 저장된 booking의 최종 ticketId
+  var savedBk = bookings.find(function(x){ return x.id === savedBookingId; });
+  var usedTicketId = savedBk ? savedBk.ticketId : null;
 
   // 완료 처리: 회원 통계 업데이트
   if (status === 'done') {
     member.visitCount = bookings.filter(function(b){ return (b.name===name||b.phone===phone) && b.status==='done'; }).length;
     member.lastVisit = date;
     member.totalSales = bookings.filter(function(b){ return (b.name===name||b.phone===phone) && isRevenu(b); }).reduce(function(s,b){ return s+(b.price||0); },0);
+  }
+
+  // ★ 이용권 자동 차감: 완료 저장이고 이용권 있고 이전에 차감 안 된 경우
+  if (status === 'done' && usedTicketId && prevStatus !== 'done') {
+    var alreadyDeducted = ticketHistory.some(function(h){ return h.bookingId === savedBookingId; });
+    if (!alreadyDeducted) {
+      var tk = tickets.find(function(x){ return x.id === usedTicketId; });
+      if (tk) {
+        var deductAmt;
+        if (tk.type === 'count') {
+          var cntEl = document.getElementById('b-deduct-count-val');
+          var deductCnt = cntEl ? (parseInt(cntEl.value)||1) : 1;
+          tk.remain = Math.max(0, tk.remain - deductCnt);
+          deductAmt = deductCnt;
+        } else {
+          var amtEl = document.getElementById('b-deduct-amount-val');
+          deductAmt = amtEl ? (parseInt(amtEl.value)||0) : 0;
+          if (deductAmt > 0) {
+            // 금액권: price도 차감 금액으로 업데이트
+            if (savedBk) savedBk.price = deductAmt;
+            tk.remain = Math.max(0, tk.remain - deductAmt);
+          }
+        }
+        if (tk.remain <= 0) tk.closed = true;
+        ticketHistory.push({
+          ticketId: usedTicketId, bookingId: savedBookingId, date: date,
+          servicePrice: deductAmt, discount: 0, amount: deductAmt,
+          remain: tk.remain, reason: service
+        });
+        showToast('저장 완료 (' + (tk.type==='count' ? (deductAmt + '회 차감, 잔여 ' + tk.remain + '회') : (fmtMoney(deductAmt) + ' 차감, 잔여 ' + fmtMoney(tk.remain))) + ')');
+      }
+    }
   }
 
   saveData();
