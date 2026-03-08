@@ -1473,31 +1473,47 @@ function onBookingTicketOrStatusChange() {
 
   section.style.display = 'block';
 
+  // 현재 편집중인 booking의 차감 이력이 있는지 확인
+  var existingDeduct = null;
+  if (bookingEditId) {
+    existingDeduct = ticketHistory.find(function(h){ return h.bookingId === bookingEditId; });
+  }
+
   var html = '';
-  if (t.type === 'count') {
-    // 횟수권: 잔여 표시 + 1~5(최대 잔여) 선택
+
+  if (existingDeduct) {
+    // 이미 차감된 경우 → 차감 내역만 표시
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;">';
+    html += '<span style="font-size:20px;">✅</span>';
+    html += '<div>';
+    html += '<div style="font-size:12px;font-weight:700;color:var(--primary-dark);">이미 차감 완료</div>';
+    if (t.type === 'count') {
+      html += '<div style="font-size:12px;color:var(--text2);">차감: ' + existingDeduct.amount + '회 · 잔여: ' + t.remain + '회</div>';
+    } else {
+      html += '<div style="font-size:12px;color:var(--text2);">차감: ' + fmtMoney(existingDeduct.amount) + ' · 잔여: ' + fmtMoney(t.remain) + '</div>';
+    }
+    html += '</div></div>';
+  } else if (t.type === 'count') {
+    // 횟수권: 잔여 + 1~5회 선택
     var maxSel = Math.min(5, t.remain);
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">';
-    html += '<span style="font-size:12px;color:var(--text2);">잔여 <strong style="color:var(--primary-dark);">' + t.remain + '회</strong></span>';
-    html += '</div>';
-    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+    html += '<div style="font-size:12px;color:var(--text2);margin-bottom:8px;">잔여 <strong style="color:var(--primary-dark);">' + t.remain + '회</strong> → 몇 회 차감할까요?</div>';
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">';
     for (var i = 1; i <= maxSel; i++) {
       var active = i === 1 ? 'btn-primary' : 'btn-outline';
       html += '<button type="button" class="btn btn-sm ' + active + '" id="b-deduct-count-' + i + '" onclick="selectDeductCount(' + i + ',' + maxSel + ')">' + i + '회</button>';
     }
     html += '</div>';
     html += '<input type="hidden" id="b-deduct-count-val" value="1">';
-    html += '<div style="font-size:11px;color:var(--text2);margin-top:6px;">차감 후 잔여: <strong id="b-deduct-after">' + (t.remain - 1) + '회</strong></div>';
+    html += '<div style="font-size:12px;color:var(--text2);">차감 후 잔여: <strong id="b-deduct-after" style="color:var(--primary-dark);">' + (t.remain - 1) + '회</strong></div>';
   } else {
-    // 금액권: 잔여 표시 + 금액 직접 입력
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
-    html += '<span style="font-size:12px;color:var(--text2);">잔여 <strong style="color:var(--primary-dark);">' + fmtMoney(t.remain) + '</strong></span>';
-    html += '</div>';
-    html += '<div class="form-group" style="margin-bottom:6px;"><label class="form-label" style="font-size:12px;">차감 금액 (원)</label>';
-    html += '<input class="form-input" type="number" id="b-deduct-amount-val" placeholder="0" oninput="onDeductAmountInput(' + t.remain + ')" style="font-weight:700;">';
-    html += '</div>';
-    html += '<div style="font-size:11px;color:var(--text2);">차감 후 잔여: <strong id="b-deduct-after">' + fmtMoney(t.remain) + '</strong></div>';
+    // 금액권: 잔여 + 금액 직접 입력
+    var remain = t.remain;
+    html += '<div style="font-size:12px;color:var(--text2);margin-bottom:8px;">잔여 <strong style="color:var(--primary-dark);">' + fmtMoney(remain) + '</strong></div>';
+    html += '<label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:4px;">차감 금액 (원) *</label>';
+    html += '<input class="form-input" type="number" id="b-deduct-amount-val" placeholder="차감할 금액 입력" oninput="onDeductAmountInput(' + remain + ')" style="font-weight:700;font-size:16px;margin-bottom:6px;">';
+    html += '<div style="font-size:12px;color:var(--text2);">차감 후 잔여: <strong id="b-deduct-after" style="color:var(--primary-dark);">' + fmtMoney(remain) + '</strong></div>';
   }
+
   body.innerHTML = html;
 }
 
@@ -1717,14 +1733,26 @@ function saveBooking() {
           servicePrice: deductAmt, discount: 0, amount: deductAmt,
           remain: tk.remain, reason: service
         });
-        showToast('저장 완료 (' + (tk.type==='count' ? (deductAmt + '회 차감, 잔여 ' + tk.remain + '회') : (fmtMoney(deductAmt) + ' 차감, 잔여 ' + fmtMoney(tk.remain))) + ')');
       }
     }
   }
 
   saveData();
   closeModal('modal-booking');
-  showToast(isNew ? '예약이 추가되었습니다' : '수정되었습니다');
+
+  // 차감 토스트 vs 일반 토스트
+  if (status === 'done' && usedTicketId && prevStatus !== 'done') {
+    var tk2 = tickets.find(function(x){ return x.id === usedTicketId; });
+    if (tk2) {
+      showToast(tk2.type==='count'
+        ? '완료 저장 · ' + (isNew ? 1 : (parseInt((document.getElementById('b-deduct-count-val')||{}).value)||1)) + '회 차감 → 잔여 ' + tk2.remain + '회'
+        : '완료 저장 · ' + fmtMoney(tk2.remain) + ' 잔여');
+    } else {
+      showToast(isNew ? '예약이 추가되었습니다' : '수정되었습니다');
+    }
+  } else {
+    showToast(isNew ? '예약이 추가되었습니다' : '수정되었습니다');
+  }
 
   // 알림톡 발송
   if (isNew && status === 'confirmed') {
@@ -1734,6 +1762,10 @@ function saveBooking() {
   }
 
   renderTab(currentTab);
+  // ★ 매출 통계 패널이 열려 있으면 자동 갱신
+  if (document.getElementById('panel-stats').classList.contains('open')) {
+    renderStatsPanel();
+  }
   if (document.getElementById('panel-member-detail').classList.contains('open')) {
     var m2 = members.find(function(x){ return x.id === currentMemberDetailId; });
     if (m2) renderMemberDetailBody(m2);
