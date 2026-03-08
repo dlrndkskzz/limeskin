@@ -459,7 +459,7 @@ var bookingEditId = null;
 var ticketEditId = null;
 var memberEditId = null;
 var bookingFromMemberPanel = false;
-var serviceAddCalledFrom = null; // 'booking' | 'service-panel'
+var serviceAddCalledFrom = null;
 var statsTab = 'summary';
 var ticketTabFilter = 'all';
 var memberSort = 'name';
@@ -602,6 +602,7 @@ function payMethodLabel(pm) {
   if (pm === 'card') return '카드';
   if (pm === 'cash') return '현금';
   if (pm === 'transfer') return '계좌이체';
+  if (pm === 'ticket') return '이용권';
   return '';
 }
 function payMethodBadge(pm) {
@@ -609,6 +610,7 @@ function payMethodBadge(pm) {
   if (pm === 'card') return '<span class="badge badge-blue">💳 카드</span>';
   if (pm === 'cash') return '<span class="badge badge-green">💵 현금</span>';
   if (pm === 'transfer') return '<span class="badge badge-gold">🏦 이체</span>';
+  if (pm === 'ticket') return '<span class="badge badge-gray">🎫 이용권</span>';
   return '';
 }
 function isRevenu(b) {
@@ -617,6 +619,8 @@ function isRevenu(b) {
   if (b.ticketId) return false;
   // type이 이용권차감이면 제외 (ticketId 유실된 기존 데이터 대비)
   if (b.type === '이용권차감') return false;
+  // ★ 결제수단이 이용권이면 매출 제외
+  if (b.payMethod === 'ticket') return false;
   // ticketHistory에 bookingId로 등록된 경우 = 이용권 차감 시술 → 제외
   if (b.id) {
     for (var i = 0; i < ticketHistory.length; i++) {
@@ -1439,7 +1443,8 @@ function buildTicketOptions(name, phone, selectedId) {
 }
 
 function renderPayMethodBtns(selected, ctx) {
-  var opts = [['','선택안함'],['card','💳 카드'],['cash','💵 현금'],['transfer','🏦 계좌이체']];
+  var opts = [['','선택안함'],['card','💳 카드'],['cash','💵 현금'],['transfer','🏦 이체']];
+  if (ctx === 'booking') opts.push(['ticket','🎫 이용권']);
   var html = '<div class="pay-method-group">';
   opts.forEach(function(o){
     var active = selected === o[0] ? 'active ' + (o[0]||'none') : '';
@@ -1452,7 +1457,7 @@ function renderPayMethodBtns(selected, ctx) {
 function selectPayMethod(ctx, val, btn) {
   var group = btn.parentElement;
   group.querySelectorAll('.pay-method-btn').forEach(function(b){
-    b.classList.remove('active','card','cash','transfer','none');
+    b.classList.remove('active','card','cash','transfer','ticket','none');
   });
   btn.classList.add('active');
   if (val) btn.classList.add(val); else btn.classList.add('none');
@@ -2059,6 +2064,7 @@ function uploadJSON(input) {
   reader.readAsText(file);
 }
 
+
 // ============================================================
 // ===== 매출 통계 패널 =====
 // ============================================================
@@ -2362,7 +2368,7 @@ function renderPaymentDetailBody(period, type) {
         html += '</span>';
         html += '<span style="color:var(--text2);">' + esc(b.service||'') + '</span>';
         if (b.payMethod) html += payMethodBadge(b.payMethod);
-        if (b.ticketId) html += '<span style="color:var(--text2);">이용권차감</span>';
+        if (b.ticketId || b.type === '이용권차감' || b.payMethod === 'ticket') html += '<span style="color:var(--text3);">이용권차감</span>';
         else html += '<span style="font-weight:700;">' + fmtMoney(b.price||0) + '</span>';
         html += '</div>';
       });
