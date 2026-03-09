@@ -1910,7 +1910,33 @@ function saveMember() {
 
   if (editingMemberId) {
     var m = members.find(function(x){ return x.id === editingMemberId; });
-    if (m) { m.name=name; m.phone=phone; m.email=email; m.birth=birth; m.src=src; m.memo=memo; }
+    if (m) {
+      var oldName = m.name;
+      var oldPhone = m.phone;
+      m.name=name; m.phone=phone; m.email=email; m.birth=birth; m.src=src; m.memo=memo;
+
+      // 연결된 예약/이용권/차감이력도 이름·전화번호 동기화
+      bookings.forEach(function(b) {
+        if (b.memberId === editingMemberId ||
+            (b.name === oldName && (!oldPhone || b.phone === oldPhone))) {
+          b.memberId = editingMemberId;
+          b.name = name;
+          b.memberName = name;
+          b.phone = phone;
+        }
+      });
+      tickets.forEach(function(t) {
+        if (t.memberId === editingMemberId ||
+            (t.memberName === oldName)) {
+          t.memberId = editingMemberId;
+          t.memberName = name;
+        }
+      });
+      ticketHistory.forEach(function(h) {
+        if (h.memberName === oldName) h.memberName = name;
+      });
+      updateMemberStats(editingMemberId);
+    }
   } else {
     members.push({id:uid(),name:name,phone:phone,email:email,birth:birth,src:src,memo:memo,visitCount:0,totalSales:0,lastVisit:'',createdAt:todayStr(),photos:[]});
   }
@@ -1918,8 +1944,8 @@ function saveMember() {
   closeModal('modal-member');
   renderMembers();
   if (currentMemberId && editingMemberId === currentMemberId) {
-    var m = members.find(function(x){ return x.id === currentMemberId; });
-    if (m) renderMemberDetailBody(m);
+    var m2 = members.find(function(x){ return x.id === currentMemberId; });
+    if (m2) renderMemberDetailBody(m2);
   }
   showToast(editingMemberId ? '회원 정보가 수정되었습니다' : '회원이 추가되었습니다');
 }
@@ -2581,7 +2607,11 @@ function openMemberByName(name) {
 /* Payment Panel */
 function openPaymentPanel(year, month) {
   document.getElementById('payment-panel-title').textContent = year+'년 '+month+'월 결제 상세';
-  var dayBks = bookings.filter(function(b){ if(!b.date)return false;var p=b.date.split('-');return parseInt(p[0])===year&&parseInt(p[1])===month&&b.status==='done'; });
+  var dayBks = bookings.filter(function(b){
+    if(!b.date)return false;
+    var p=b.date.split('-');
+    return parseInt(p[0])===year&&parseInt(p[1])===month&&b.status==='done'&&!b.naverImport;
+  });
   dayBks.sort(function(a,b){ return b.date.localeCompare(a.date)||(a.time||'').localeCompare(b.time||''); });
   var groups = {};var dateOrder=[];
   dayBks.forEach(function(b){ var d=b.date;if(!groups[d]){groups[d]=[];dateOrder.push(d);}groups[d].push(b); });
