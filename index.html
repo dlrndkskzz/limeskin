@@ -1035,53 +1035,43 @@ function getSolApiSecret() { return settings.apiSecret || SOLAPY_API_SECRET; }
 function getSolPfId() { return settings.senderKey || SOLAPY_PFID; }
 function getSolFrom() { return (settings.senderPhone || '').replace(/-/g,'') || (settings.phone || '').replace(/-/g,''); }
 
-function solApiSignature(date) {
-  // HMAC-SHA256은 브라우저에서 직접 못하므로 솔라피 직접 발송 방식 사용
-  // 솔라피는 Authorization: Basic base64(apiKey:apiSecret) 방식 지원
-  return 'Basic ' + btoa(getSolApiKey() + ':' + getSolApiSecret());
-}
-
 function sendAlimtalk(phone, templateCode, variables) {
-  if (!phone || phone.length < 9) {
+  if (!phone || phone.replace(/-/g,'').length < 9) {
     console.log('[알림톡] 전화번호 없음, 건너뜀');
     return Promise.resolve({ok: false, reason: 'no_phone'});
   }
-  var to = phone.replace(/-/g,'');
+  var to   = phone.replace(/-/g,'');
   var from = getSolFrom();
   if (!from) {
-    console.log('[알림톡] 발신번호 없음');
+    console.log('[알림톡] 발신번호 없음 → 업체 설정에서 발신 전화번호를 저장하세요');
     return Promise.resolve({ok: false, reason: 'no_from'});
   }
   var pfId = getSolPfId();
-  
-  // 변수 치환: #{변수명} 형태
   var text = getAlimtalkText(templateCode, variables);
-  
+
   var body = {
     messages: [{
-      to: to,
+      to:   to,
       from: from,
-      kakaoOptions: {
-        pfId: pfId,
-        templateId: templateCode,
-        variables: variables || {}
-      },
       type: 'ATA',
-      text: text
+      text: text,
+      kakaoOptions: {
+        pfId:       pfId,
+        templateId: templateCode,
+        variables:  variables || {}
+      }
     }]
   };
-  
-  return fetch('https://api.solapi.com/messages/v4/send-many', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': solApiSignature()
-    },
-    body: JSON.stringify(body)
+
+  // ✅ Vercel serverless route 경유 (HMAC-SHA256 서명은 서버에서 처리)
+  return fetch('/api/alimtalk', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(body)
   }).then(function(r){ return r.json(); }).then(function(data){
     console.log('[알림톡 응답]', data);
-    if (data.errorCode) {
-      return {ok: false, reason: data.errorMessage || data.errorCode};
+    if (data.errorCode || !data.ok) {
+      return {ok: false, reason: data.errorMessage || data.error || data.errorCode};
     }
     return {ok: true, data: data};
   }).catch(function(e){
