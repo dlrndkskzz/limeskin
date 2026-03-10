@@ -3355,6 +3355,15 @@ function saveTicket() {
   if (isEdit) {
     var idx = tickets.findIndex(function(x){ return x.id===editingTicketId; });
     if (idx >= 0) tickets[idx] = t;
+    // 수정 시 연결된 매출 예약도 업데이트
+    var existingSale = bookings.find(function(b){ return b.ticketSaleId === editingTicketId; });
+    if (existingSale) {
+      existingSale.service    = name + ' 결제';
+      existingSale.price      = paidAmount;
+      existingSale.payMethod  = payMethod;
+      existingSale.name       = m ? m.name : existingSale.name;
+      existingSale.memberId   = memberId;
+    }
   } else {
     tickets.push(t);
     // 이용권 결제금액이 있으면 매출 예약 자동 생성 (금액권/횟수권 공통)
@@ -3375,9 +3384,9 @@ function saveTicket() {
         memo: (type==='count'?'횟수권':'금액권') + ' 등록 자동 매출'
       };
       bookings.push(saleBooking);
-      if (m) updateMemberStats(m.id);
     }
   }
+  if (m) updateMemberStats(m.id);
 
   saveData();
   closeModal('modal-ticket');
