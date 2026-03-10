@@ -3252,14 +3252,28 @@ function openModalTicket(id, presetMemberId) {
   
   document.getElementById('ticket-modal-title').textContent = isEdit ? '이용권 수정' : '이용권 추가';
   
-  var memberOptions = '<option value="">회원 선택</option>'+
-    members.slice().sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); }).map(function(m){
-      return '<option value="'+m.id+'" '+(defaultMemberId===m.id?'selected':'')+'>'+m.name+(m.phone?' ('+m.phone+')':'')+'</option>';
-    }).join('');
-  
-  var html = '<div class="form-group">'+
+  var sortedMembers = members.slice().sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+  var defaultMemberName = '';
+  if (defaultMemberId) {
+    var dm = getMemberById(defaultMemberId);
+    if (dm) defaultMemberName = dm.name + (dm.phone?' ('+dm.phone+')':'');
+  }
+
+  var html = '<div class="form-group" style="position:relative;">'+
     '<label class="label">회원 *</label>'+
-    '<select class="input" id="tk-member">'+memberOptions+'</select>'+
+    '<input type="text" class="input" id="tk-member-search" placeholder="이름으로 검색..." autocomplete="off"'+
+    ' value="'+defaultMemberName+'"'+
+    ' oninput="filterTkMembers()" onfocus="showTkDropdown()" onblur="setTimeout(hideTkDropdown,200)">'+
+    '<input type="hidden" id="tk-member" value="'+defaultMemberId+'">'+
+    '<div id="tk-member-dropdown" style="display:none;position:absolute;z-index:9999;width:100%;max-height:200px;overflow-y:auto;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);top:100%;">'+
+    sortedMembers.map(function(m){
+      return '<div class="tk-member-opt" data-id="'+m.id+'" data-name="'+m.name+(m.phone?' ('+m.phone+')':'')+
+        '" style="padding:10px 14px;cursor:pointer;font-size:14px;border-bottom:1px solid var(--border);"'+
+        ' onmousedown="selectTkMember(\''+m.id+'\',\''+encodeURIComponent(m.name+(m.phone?' ('+m.phone+')'||'':''))+'\')">'+
+        m.name+(m.phone?' <span style="color:var(--text3);font-size:12px;">('+m.phone+')</span>':'')+
+        '</div>';
+    }).join('')+
+    '</div>'+
     '</div>'+
     '<div class="form-group">'+
     '<label class="label">이용권명 *</label>'+
@@ -3305,6 +3319,31 @@ function openModalTicket(id, presetMemberId) {
   document.getElementById('ticket-modal-footer').innerHTML = footer;
   
   document.getElementById('modal-ticket').classList.add('open');
+}
+
+function showTkDropdown() {
+  var dd = document.getElementById('tk-member-dropdown');
+  if (dd) dd.style.display = '';
+}
+function hideTkDropdown() {
+  var dd = document.getElementById('tk-member-dropdown');
+  if (dd) dd.style.display = 'none';
+}
+function filterTkMembers() {
+  var q = (document.getElementById('tk-member-search').value||'').toLowerCase();
+  document.getElementById('tk-member').value = ''; // 검색 중엔 선택 초기화
+  var opts = document.querySelectorAll('.tk-member-opt');
+  var dd = document.getElementById('tk-member-dropdown');
+  if (dd) dd.style.display = '';
+  opts.forEach(function(el){
+    var name = (el.dataset.name||'').toLowerCase();
+    el.style.display = name.indexOf(q) !== -1 ? '' : 'none';
+  });
+}
+function selectTkMember(id, encodedName) {
+  document.getElementById('tk-member').value = id;
+  document.getElementById('tk-member-search').value = decodeURIComponent(encodedName);
+  hideTkDropdown();
 }
 
 function selectTicketType(type, el) {
