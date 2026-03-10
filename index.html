@@ -2431,8 +2431,12 @@ function openMemberDetail(id) {
     '</div>';
   
   // 이용권 목록
-  if (memberTickets.length > 0) {
-    html += '<div class="card"><div class="section-title">보유 이용권</div>';
+  html += '<div class="card">';
+  html += '<div class="sec-row"><div class="section-title">보유 이용권</div>'+
+    '<button class="btn btn-primary btn-sm" onclick="openModalTicket(null,\''+id+'\')" style="font-size:12px;">+ 이용권 추가</button></div>';
+  if (memberTickets.length === 0) {
+    html += '<div style="color:var(--text3);font-size:13px;padding:8px 0;">이용권이 없습니다</div>';
+  } else {
     memberTickets.forEach(function(t){
       var today2 = todayStr();
       var expired = t.closed || (t.expire && t.expire < today2);
@@ -2441,13 +2445,16 @@ function openMemberDetail(id) {
         '<div>'+
         '<div style="font-size:13px;font-weight:600;">'+t.name+'</div>'+
         '<div style="font-size:12px;color:var(--primary);">잔여: '+remainTxt+'</div>'+
+        '<div style="font-size:11px;color:var(--text3);">만료: '+(t.expire||'-')+'</div>'+
         '</div>'+
-        (!expired?'<button class="btn btn-primary btn-sm" onclick="openModalDeduct(\''+t.id+'\')">차감</button>':
-        '<span class="badge badge-red">만료</span>')+
+        '<div style="display:flex;gap:6px;align-items:center;">'+
+        (!expired?'<button class="btn btn-primary btn-sm" onclick="openModalDeduct(\''+t.id+'\')" style="font-size:11px;">차감</button>':'<span class="badge badge-red">만료</span>')+
+        '<button class="btn btn-secondary btn-sm" onclick="openModalTicket(\''+t.id+'\')" style="font-size:11px;">수정</button>'+
+        '</div>'+
         '</div>';
     });
-    html += '</div>';
   }
+  html += '</div>';
   
   // 피부 사진
   var photos = m.photos || [];
@@ -3208,16 +3215,18 @@ function deleteBooking(id) {
 // ============================================================
 // 이용권 모달
 // ============================================================
-function openModalTicket(id) {
+function openModalTicket(id, presetMemberId) {
   editingTicketId = id;
   var isEdit = !!id;
   var t = isEdit ? getTicketById(id) : null;
+  // 미리 선택할 회원 (회원 상세에서 호출 시)
+  var defaultMemberId = (t && t.memberId) || presetMemberId || '';
   
   document.getElementById('ticket-modal-title').textContent = isEdit ? '이용권 수정' : '이용권 추가';
   
   var memberOptions = '<option value="">회원 선택</option>'+
     members.slice().sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); }).map(function(m){
-      return '<option value="'+m.id+'" '+(t&&t.memberId===m.id?'selected':'')+'>'+m.name+(m.phone?' ('+m.phone+')':'')+'</option>';
+      return '<option value="'+m.id+'" '+(defaultMemberId===m.id?'selected':'')+'>'+m.name+(m.phone?' ('+m.phone+')':'')+'</option>';
     }).join('');
   
   var html = '<div class="form-group">'+
