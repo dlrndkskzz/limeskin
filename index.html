@@ -998,7 +998,7 @@ function saveData() {
     settings: settings
   };
   localStorage.setItem('limeskin_v3', JSON.stringify(d));
-  // 서버 동기화 (Cron 리마인드용) - 조용히 전송
+  // 서버 동기화 (Cron 리마인드용)
   try {
     fetch('/api/sync', {
       method: 'POST',
