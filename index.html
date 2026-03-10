@@ -784,11 +784,12 @@ var SOLAPY_API_SECRET = 'I7TAN3PP8A0JOCPYFFM5B4XEN0SHNTYL';
 var SOLAPY_PFID = 'KA01PF260309090616232tYkpP3Ktxxu';
 
 // 알림톡 템플릿 코드
-var TPL_CONFIRMED = 'KA01TP260303085248678ef4l9FvKT92';
-var TPL_CANCEL    = 'KA01TP260303085406608JlVxRzvGT24';
-var TPL_DEDUCT    = 'KA01TP260303085526915X7VfYFYZD6s';
-var TPL_LOW       = 'KA01TP260303085621327gXfCYSrmKBF';
-var TPL_CLOSEDAY  = 'KA01TP26030308570608289qGVOhqmrP';
+var TPL_CONFIRMED = 'KA01TP260303085248678ef4l9FvKT92'; // 예약확정알림
+var TPL_CANCEL    = 'KA01TP260303085406608JlVxRzvGT24'; // 예약취소
+var TPL_DEDUCT    = 'KA01TP260303085526915X7VfYFYZD6s'; // 이용차감알림
+var TPL_LOW       = 'KA01TP260303085621327gXfCYSrmKBF'; // 잔여소진임박
+var TPL_EXPIRE7   = 'KA01TP26030308570608289qGVOhqmrP'; // 만료7일전알림
+var TPL_REMIND    = 'KA01TP260303085208365I0uoVbWPhTo'; // 리마인드(내일예약)
 
 var FORTUNES = [
   '오늘은 새로운 시작을 알리는 날입니다. 밝은 미소로 고객을 맞이하세요.',
@@ -1099,12 +1100,16 @@ function getAlimtalkText(templateCode, vars) {
   if (templateCode === TPL_DEDUCT) {
     return fill('#{고객명}님, 이용해 주셔서 감사합니다 \uD83C\uDF4B\n\n결제하신 이용권이 사용되었습니다.\n\n\uD83D\uDD22 시술: #{서비스}\n\uD83D\uDCB3 사용금액: #{사용금액}\n\uD83D\uDCB0 잔여금액: #{잔여금액}\n\uD83D\uDCC5 사용기한: #{만료일}\n\n또 방문해 주세요 \uD83D\uDC9A\n\uD83D\uDCDE 010-3205-7451');
   }
-  // 이용권부족(잔여소진임박): #{고객명} #{이용권명} #{잔여금액} #{만료일}
+  // 잔여소진임박: #{고객명} #{이용권명} #{잔여금액} #{만료일}
   if (templateCode === TPL_LOW) {
     return fill('#{고객명}님, 결제하신 이용권 잔여가 얼마 남지 않았어요 \u26A0\uFE0F\n\n\uD83C\uDF9F 이용권: #{이용권명}\n\uD83D\uDCB0 잔여: #{잔여금액}\n\uD83D\uDCC5 사용기한: #{만료일}\n\n만료 전에 꼭 사용해 주세요!\n갱신 문의: 010-3205-7451');
   }
-  // 내일예약알림: #{고객명} #{시간} #{서비스}
-  if (templateCode === TPL_CLOSEDAY) {
+  // 만료7일전: #{고객명} #{이용권명} #{잔여금액} #{만료일}
+  if (templateCode === TPL_EXPIRE7) {
+    return fill('#{고객명}님, 구매하신 이용권 만료가 7일 남았습니다 \uD83D\uDCCC\n\n\uD83C\uDF9F #{이용권명}\n\uD83D\uDCB0 잔여: #{잔여금액}\n\uD83D\uDCC5 만료일: #{만료일}\n\n만료 전에 꼭 사용해 주세요!\n갱신 문의: 010-3205-7451\n\uD83D\uDCCD 라임스킨 목동서로213 404호');
+  }
+  // 리마인드(내일예약): #{고객명} #{시간} #{서비스}
+  if (templateCode === TPL_REMIND) {
     return fill('#{고객명}님, 내일 예약이 있습니다 \uD83D\uDD14\n\n\uD83D\uDCC5 내일 #{시간}\n\u2728 시술: #{서비스}\n\n\uD83D\uDCDE 010-3205-7451\n\uD83D\uDCCD 라임스킨 목동서로213 404호');
   }
   return '';
@@ -3720,7 +3725,7 @@ function checkTicketExpiry() {
     if (t.expire <= in7Str && t.expire > today) {
       var alreadyNotified = settings.notifiedTickets.some(function(n){ return n.ticketId===t.id && n.type==='7d'; });
       if (!alreadyNotified) {
-        sendAlimtalk(m.phone, TPL_LOW, {
+        sendAlimtalk(m.phone, TPL_EXPIRE7, {
           '고객명':   m.name,
           '이용권명': t.name,
           '잔여금액': t.type==='money' ? fmtMoney(t.remain) : t.remain+'회',
@@ -3745,6 +3750,32 @@ function checkTicketExpiry() {
     }
   });
   
+  // ── 내일 예약 리마인드 발송 ─────────────────────────────
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  var tomorrowStr = tomorrow.getFullYear()+'-'+pad(tomorrow.getMonth()+1)+'-'+pad(tomorrow.getDate());
+
+  if (!settings.notifiedRemind) settings.notifiedRemind = [];
+
+  bookings.forEach(function(b){
+    if (b.date !== tomorrowStr) return;
+    if (b.status === 'cancelled') return;
+    var phone = b.phone || '';
+    if (!phone) {
+      var mb = getMemberById(b.memberId);
+      phone = mb ? mb.phone : '';
+    }
+    if (!phone) return;
+    var alreadySent = settings.notifiedRemind.some(function(n){ return n.bookingId === b.id && n.date === today; });
+    if (alreadySent) return;
+    sendAlimtalk(phone, TPL_REMIND, {
+      '고객명': b.name || '',
+      '시간':   b.time || '',
+      '서비스': b.service || ''
+    });
+    settings.notifiedRemind.push({bookingId: b.id, date: today});
+  });
+
   saveData();
 }
 
