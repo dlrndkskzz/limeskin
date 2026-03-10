@@ -998,6 +998,14 @@ function saveData() {
     settings: settings
   };
   localStorage.setItem('limeskin_v3', JSON.stringify(d));
+  // 서버 동기화 (Cron 리마인드용) - 조용히 전송
+  try {
+    fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookings: bookings, members: members, settings: settings })
+    }).catch(function(){});
+  } catch(e) {}
 }
 
 function loadData() {
@@ -3817,31 +3825,34 @@ function checkTicketExpiry() {
     }
   });
   
-  // ── 내일 예약 리마인드 발송 ─────────────────────────────
-  var tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  var tomorrowStr = tomorrow.getFullYear()+'-'+pad(tomorrow.getMonth()+1)+'-'+pad(tomorrow.getDate());
+  // ── 내일 예약 리마인드 발송 (오후 3시 = 15:00~15:59 사이에만) ──
+  var nowHour = new Date().getHours();
+  if (nowHour === 15) {
+    var tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    var tomorrowStr = tomorrow.getFullYear()+'-'+pad(tomorrow.getMonth()+1)+'-'+pad(tomorrow.getDate());
 
-  if (!settings.notifiedRemind) settings.notifiedRemind = [];
+    if (!settings.notifiedRemind) settings.notifiedRemind = [];
 
-  bookings.forEach(function(b){
-    if (b.date !== tomorrowStr) return;
-    if (b.status === 'cancelled') return;
-    var phone = b.phone || '';
-    if (!phone) {
-      var mb = getMemberById(b.memberId);
-      phone = mb ? mb.phone : '';
-    }
-    if (!phone) return;
-    var alreadySent = settings.notifiedRemind.some(function(n){ return n.bookingId === b.id && n.date === today; });
-    if (alreadySent) return;
-    sendAlimtalk(phone, TPL_REMIND, {
-      '고객명': b.name || '',
-      '시간':   b.time || '',
-      '서비스': b.service || ''
+    bookings.forEach(function(b){
+      if (b.date !== tomorrowStr) return;
+      if (b.status === 'cancelled') return;
+      var phone = b.phone || '';
+      if (!phone) {
+        var mb = getMemberById(b.memberId);
+        phone = mb ? mb.phone : '';
+      }
+      if (!phone) return;
+      var alreadySent = settings.notifiedRemind.some(function(n){ return n.bookingId === b.id && n.date === today; });
+      if (alreadySent) return;
+      sendAlimtalk(phone, TPL_REMIND, {
+        '고객명': b.name || '',
+        '시간':   b.time || '',
+        '서비스': b.service || ''
+      });
+      settings.notifiedRemind.push({bookingId: b.id, date: today});
     });
-    settings.notifiedRemind.push({bookingId: b.id, date: today});
-  });
+  }
 
   saveData();
 }
