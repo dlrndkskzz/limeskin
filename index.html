@@ -3261,6 +3261,10 @@ function openModalTicket(id, presetMemberId) {
     '<label class="label">총 횟수</label>'+
     '<input type="number" class="input" id="tk-total-count" value="'+((t&&t.type==='count'?t.total:0)||0)+'" placeholder="0">'+
     '</div>'+
+    '<div class="form-group" id="tk-paid-field" style="'+(t&&t.type!=='count'?'display:none;':'')+'">'+
+    '<label class="label">결제 금액 (원)</label>'+
+    '<input type="number" class="input" id="tk-paid-amount" value="'+((t&&t.paidAmount)||0)+'" placeholder="0">'+
+    '</div>'+
     '<div class="form-group">'+
     '<label class="label">만료일</label>'+
     '<input type="date" class="input" id="tk-expire" value="'+((t&&t.expire)||'')+'">'+
@@ -3285,6 +3289,7 @@ function selectTicketType(type, el) {
   el.classList.add('active');
   document.getElementById('tk-money-field').style.display = type==='money' ? '' : 'none';
   document.getElementById('tk-count-field').style.display = type==='count' ? '' : 'none';
+  document.getElementById('tk-paid-field').style.display  = type==='count' ? '' : 'none';
 }
 
 function saveTicket() {
@@ -3296,13 +3301,14 @@ function saveTicket() {
   var typeEl = document.querySelector('#tk-type-btns .pay-btn.active');
   var type = typeEl ? typeEl.dataset.type : 'money';
   var total = type==='money' ? +document.getElementById('tk-total-money').value||0 : +document.getElementById('tk-total-count').value||0;
-  
+  var paidAmount = type==='count' ? (+document.getElementById('tk-paid-amount').value||0) : total;
+
   var pmEl = document.querySelector('#pay-btns-ticket .pay-btn.active');
   var payMethod = pmEl ? pmEl.dataset.method : '';
-  
+
   var m = getMemberById(memberId);
   var isEdit = !!editingTicketId;
-  
+
   var t = {
     id: isEdit ? editingTicketId : uid(),
     memberId: memberId,
@@ -3311,22 +3317,44 @@ function saveTicket() {
     type: type,
     total: total,
     remain: isEdit ? (getTicketById(editingTicketId)||{}).remain||total : total,
+    paidAmount: paidAmount,
     expire: document.getElementById('tk-expire').value||'',
     closed: false,
     createdAt: isEdit ? (getTicketById(editingTicketId)||{}).createdAt||todayStr() : todayStr(),
     payMethod: payMethod
   };
-  
+
   if (isEdit) {
     var idx = tickets.findIndex(function(x){ return x.id===editingTicketId; });
     if (idx >= 0) tickets[idx] = t;
   } else {
     tickets.push(t);
+    // 횟수권 결제금액이 있으면 매출 예약 자동 생성
+    if (type === 'count' && paidAmount > 0) {
+      var saleBooking = {
+        id: uid(),
+        date: todayStr(),
+        time: '',
+        name: m ? m.name : '',
+        phone: m ? m.phone||'' : '',
+        memberId: memberId,
+        service: name + ' 결제',
+        price: paidAmount,
+        payMethod: payMethod,
+        status: 'done',
+        type: '이용권결제',
+        ticketSaleId: t.id,
+        memo: '횟수권 등록 자동 매출'
+      };
+      bookings.push(saleBooking);
+      if (m) updateMemberStats(m.id);
+    }
   }
-  
+
   saveData();
   closeModal('modal-ticket');
   renderTickets();
+  if (currentTab === 'home') renderHome();
   showToast(isEdit ? '이용권이 수정되었습니다' : '이용권이 추가되었습니다');
 }
 
