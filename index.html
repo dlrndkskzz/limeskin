@@ -3391,7 +3391,12 @@ function saveTicket() {
   saveData();
   closeModal('modal-ticket');
   renderTickets();
-  if (currentTab === 'home') renderHome();
+  renderHome(); // 잔여이용권현황 항상 갱신
+  // 회원 상세 패널이 열려있으면 갱신
+  var memberPanel = document.getElementById('panel-member-detail');
+  if (memberPanel && memberPanel.classList.contains('open') && m) {
+    openMemberDetail(m.id);
+  }
   showToast(isEdit ? '이용권이 수정되었습니다' : '이용권이 추가되었습니다');
 }
 
