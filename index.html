@@ -3916,42 +3916,55 @@ function checkTicketExpiry() {
 }
 
 // ============================================================
-// Service Worker
+// 푸시 알림
 // ============================================================
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
-  
-  var swCode = [
-    "var CACHE='limeskin-v3';",
-    "self.addEventListener('install',function(e){self.skipWaiting();});",
-    "self.addEventListener('activate',function(e){e.waitUntil(clients.claim());});",
-    "self.addEventListener('fetch',function(e){",
-    "  e.respondWith(caches.match(e.request).then(function(r){",
-    "    return r||fetch(e.request).catch(function(){return new Response('offline');});",
-    "  }));",
-    "});",
-    "self.addEventListener('notificationclick',function(e){",
-    "  e.notification.close();",
-    "  e.waitUntil(clients.openWindow('/'));",
-    "});",
-    "function checkAndNotify(){",
-    "  var now=new Date();",
-    "  if(now.getHours()===19&&now.getMinutes()===0){",
-    "    self.registration.showNotification('🌙 오늘 마감 요약',{body:'오늘 영업을 마감하셨나요?',icon:'/icon.png'});",
-    "  }",
-    "}",
-    "setInterval(checkAndNotify,60000);"
-  ].join('\n');
-  
-  var blob = new Blob([swCode], {type:'application/javascript'});
-  var url = URL.createObjectURL(blob);
-  
-  navigator.serviceWorker.register(url).then(function(reg){
-    console.log('[SW] 등록 성공');
-  }).catch(function(e){
-    console.log('[SW] 등록 실패', e);
+  navigator.serviceWorker.register('/sw.js')
+    .then(function(reg){ console.log('[SW] 등록 성공'); })
+    .catch(function(e){ console.log('[SW] 등록 실패', e); });
+}
+
+var _pushChecked = {};
+function checkMorningPush() {
+  var now = new Date();
+  var h = now.getHours();
+  var today = todayStr();
+  if (h === 8 && !_pushChecked['morning_'+today]) {
+    _pushChecked['morning_'+today] = true;
+    var todayBks = bookings.filter(function(b){
+      return b.date === today && b.status !== 'cancelled';
+    });
+    if (todayBks.length === 0) return;
+    var sales = todayBks.reduce(function(s,b){ return s+(isRevenu(b)?+b.price||0:0); }, 0);
+    var body = '오늘 예약 '+todayBks.length+'건'+(sales>0?' · 예상 매출 '+fmtMoney(sales):'');
+    showPushNotification('🍋 오늘 일정 요약', body);
+  }
+}
+
+function showPushNotification(title, body) {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    navigator.serviceWorker.ready.then(function(reg){
+      reg.showNotification(title, { body: body, icon: '/icon.png', tag: 'limeskin-morning' });
+    }).catch(function(){
+      new Notification(title, { body: body });
+    });
+  } else if (Notification.permission !== 'denied') {
+    Notification.requestPermission().then(function(p){
+      if (p === 'granted') showPushNotification(title, body);
+    });
+  }
+}
+
+function requestNotificationPermission() {
+  if (!('Notification' in window)) { showToast('이 브라우저는 알림을 지원하지 않습니다'); return; }
+  Notification.requestPermission().then(function(p){
+    if (p === 'granted') showToast('✅ 알림 허용! 매일 오전 8시에 일정을 알려드립니다');
+    else showToast('알림이 차단됐어요. 브라우저 설정에서 허용해주세요');
   });
 }
+
 
 // ============================================================
 // 초기화
@@ -3971,8 +3984,17 @@ function init() {
   document.addEventListener('visibilitychange', function(){
     if (document.visibilityState === 'visible') {
       checkTicketExpiry();
+      checkMorningPush();
     }
   });
+
+  // 1분마다 오전 8시 체크
+  setInterval(checkMorningPush, 60000);
+
+  // 알림 권한 요청 (첫 실행 시)
+  if ('Notification' in window && Notification.permission === 'default') {
+    setTimeout(requestNotificationPermission, 2000);
+  }
   
   console.log('[라임스킨] 초기화 완료. 솔라피 연동 활성.');
   console.log('[솔라피] API KEY:', getSolApiKey().substr(0,8)+'...');
