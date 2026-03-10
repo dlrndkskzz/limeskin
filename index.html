@@ -781,7 +781,7 @@ var repeatEnabled = false;
 // 솔라피 기본 설정 (하드코딩)
 var SOLAPY_API_KEY = 'NCSN84FMPLK0ZRJV';
 var SOLAPY_API_SECRET = 'I7TAN3PP8A0JOCPYFFM5B4XEN0SHNTYL';
-var SOLAPY_PFID = 'KA01PF260309090616232tYkpP3Ktxxu';
+var SOLAPY_PFID = 'KA01PF260303011802344MukuvkKjzXI';
 
 // 알림톡 템플릿 코드
 var TPL_CONFIRMED = 'KA01TP260303085248678ef4l9FvKT92'; // 예약확정알림
@@ -1025,7 +1025,8 @@ function loadData() {
   // 솔라피 기본값 (설정에 없으면 하드코딩값 사용)
   if (!settings.apiKey) settings.apiKey = SOLAPY_API_KEY;
   if (!settings.apiSecret) settings.apiSecret = SOLAPY_API_SECRET;
-  if (!settings.senderKey) settings.senderKey = SOLAPY_PFID;
+  // 항상 최신 PFID로 강제 업데이트
+  settings.senderKey = SOLAPY_PFID;
 }
 
 // ============================================================
