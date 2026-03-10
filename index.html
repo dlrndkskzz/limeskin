@@ -3212,10 +3212,17 @@ function deleteBooking(id) {
     }, true);
   } else {
     showConfirm('예약 삭제', '이 예약을 삭제할까요?', function(){
+      var target = bookings.find(function(x){ return x.id === id; });
+      // 이용권 결제 예약 삭제 시 → 연결된 이용권도 함께 삭제
+      if (target && target.ticketSaleId) {
+        tickets = tickets.filter(function(t){ return t.id !== target.ticketSaleId; });
+        ticketHistory = ticketHistory.filter(function(h){ return h.ticketId !== target.ticketSaleId; });
+      }
       bookings = bookings.filter(function(x){ return x.id !== id; });
       saveData();
       closeModal('modal-booking');
       renderBookings();
+      renderTickets();
       showToast('삭제되었습니다');
     }, true);
   }
