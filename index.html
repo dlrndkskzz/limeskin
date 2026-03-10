@@ -3329,8 +3329,8 @@ function saveTicket() {
     if (idx >= 0) tickets[idx] = t;
   } else {
     tickets.push(t);
-    // 횟수권 결제금액이 있으면 매출 예약 자동 생성
-    if (type === 'count' && paidAmount > 0) {
+    // 이용권 결제금액이 있으면 매출 예약 자동 생성 (금액권/횟수권 공통)
+    if (paidAmount > 0) {
       var saleBooking = {
         id: uid(),
         date: todayStr(),
@@ -3344,7 +3344,7 @@ function saveTicket() {
         status: 'done',
         type: '이용권결제',
         ticketSaleId: t.id,
-        memo: '횟수권 등록 자동 매출'
+        memo: (type==='count'?'횟수권':'금액권') + ' 등록 자동 매출'
       };
       bookings.push(saleBooking);
       if (m) updateMemberStats(m.id);
