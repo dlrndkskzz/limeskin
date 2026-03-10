@@ -3254,8 +3254,12 @@ function openModalTicket(id, presetMemberId) {
     '</div>'+
     '</div>'+
     '<div class="form-group" id="tk-money-field" style="'+(t&&t.type==='count'?'display:none;':'')+'">'+
-    '<label class="label">충전 금액</label>'+
+    '<label class="label">충전 금액 (이용 가능 금액)</label>'+
     '<input type="number" class="input" id="tk-total-money" value="'+((t&&t.type==='money'?t.total:0)||0)+'" placeholder="0">'+
+    '</div>'+
+    '<div class="form-group" id="tk-money-paid-field" style="'+(t&&t.type==='count'?'display:none;':'')+'">'+
+    '<label class="label">결제 금액 (원)</label>'+
+    '<input type="number" class="input" id="tk-money-paid-amount" value="'+((t&&t.type==='money'&&t.paidAmount)||0)+'" placeholder="충전금액과 다를 경우 입력">'+
     '</div>'+
     '<div class="form-group" id="tk-count-field" style="'+(t&&t.type!=='count'?'display:none;':'')+'">'+
     '<label class="label">총 횟수</label>'+
@@ -3263,7 +3267,7 @@ function openModalTicket(id, presetMemberId) {
     '</div>'+
     '<div class="form-group" id="tk-paid-field" style="'+(t&&t.type!=='count'?'display:none;':'')+'">'+
     '<label class="label">결제 금액 (원)</label>'+
-    '<input type="number" class="input" id="tk-paid-amount" value="'+((t&&t.paidAmount)||0)+'" placeholder="0">'+
+    '<input type="number" class="input" id="tk-paid-amount" value="'+((t&&t.type==='count'&&t.paidAmount)||0)+'" placeholder="0">'+
     '</div>'+
     '<div class="form-group">'+
     '<label class="label">만료일</label>'+
@@ -3287,9 +3291,10 @@ function openModalTicket(id, presetMemberId) {
 function selectTicketType(type, el) {
   document.querySelectorAll('#tk-type-btns .pay-btn').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
-  document.getElementById('tk-money-field').style.display = type==='money' ? '' : 'none';
-  document.getElementById('tk-count-field').style.display = type==='count' ? '' : 'none';
-  document.getElementById('tk-paid-field').style.display  = type==='count' ? '' : 'none';
+  document.getElementById('tk-money-field').style.display      = type==='money' ? '' : 'none';
+  document.getElementById('tk-money-paid-field').style.display = type==='money' ? '' : 'none';
+  document.getElementById('tk-count-field').style.display      = type==='count' ? '' : 'none';
+  document.getElementById('tk-paid-field').style.display       = type==='count' ? '' : 'none';
 }
 
 function saveTicket() {
@@ -3301,7 +3306,15 @@ function saveTicket() {
   var typeEl = document.querySelector('#tk-type-btns .pay-btn.active');
   var type = typeEl ? typeEl.dataset.type : 'money';
   var total = type==='money' ? +document.getElementById('tk-total-money').value||0 : +document.getElementById('tk-total-count').value||0;
-  var paidAmount = type==='count' ? (+document.getElementById('tk-paid-amount').value||0) : total;
+  var paidAmount;
+  if (type === 'count') {
+    paidAmount = +document.getElementById('tk-paid-amount').value||0;
+  } else {
+    var moneyPaidEl = document.getElementById('tk-money-paid-amount');
+    var moneyPaid = moneyPaidEl ? +moneyPaidEl.value||0 : 0;
+    // 결제금액 미입력 시 충전금액으로 대체
+    paidAmount = moneyPaid > 0 ? moneyPaid : total;
+  }
 
   var pmEl = document.querySelector('#pay-btns-ticket .pay-btn.active');
   var payMethod = pmEl ? pmEl.dataset.method : '';
