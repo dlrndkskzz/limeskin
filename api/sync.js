@@ -1,8 +1,12 @@
 // api/sync.js
-// 앱 → 서버 데이터 동기화 (예약/회원 데이터 저장)
-// limeskin.html에서 saveData() 호출 시 같이 전송
+// 앱 → 서버 데이터 동기화 (Upstash Redis)
 
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
+
+const redis = new Redis({
+  url:   process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,7 +17,11 @@ module.exports = async function handler(req, res) {
 
   try {
     const { bookings, members, settings } = req.body || {};
-    await kv.set('limeskin_bookings', { bookings: bookings||[], members: members||[], settings: settings||{} });
+    await redis.set('limeskin_data', JSON.stringify({
+      bookings: bookings || [],
+      members:  members  || [],
+      settings: settings || {}
+    }));
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('[sync 오류]', err);

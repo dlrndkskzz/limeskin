@@ -40,16 +40,18 @@ module.exports = async function handler(req, res) {
     });
 
     // ── 단건 발송 엔드포인트 사용 ─────────────────────────────
+    // disableSms: true → 알림톡 실패 시 LMS 대체발송 OFF
     const solapiPayload = {
       message: {
-        to:   msg.to,
-        from: msg.from,
-        type: 'ATA',
-        text: msg.text || '',
+        to:          msg.to,
+        from:        msg.from,
+        type:        'ATA',
+        text:        msg.text || '',
         kakaoOptions: {
-          pfId:       (msg.kakaoOptions && msg.kakaoOptions.pfId)       || '',
-          templateId: (msg.kakaoOptions && msg.kakaoOptions.templateId) || '',
-          variables:  variables
+          pfId:        (msg.kakaoOptions && msg.kakaoOptions.pfId)       || '',
+          templateId:  (msg.kakaoOptions && msg.kakaoOptions.templateId) || '',
+          variables:   variables,
+          disableSms:  true
         }
       }
     };
