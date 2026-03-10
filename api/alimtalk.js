@@ -31,18 +31,31 @@ module.exports = async function handler(req, res) {
     if (!msg.to)    return res.status(400).json({ ok: false, errorMessage: '수신번호(to)가 없습니다.' });
     if (!msg.from)  return res.status(400).json({ ok: false, errorMessage: '발신번호(from)가 없습니다. 업체 설정에서 발신 전화번호를 저장하세요.' });
 
-    // ── 단건 발송 엔드포인트 사용 ──────────────────────────────
+    // ── 변수 키를 #{변수명} 형식으로 변환 (카카오 알림톡 규격) ──
+    const rawVars   = (msg.kakaoOptions && msg.kakaoOptions.variables) || {};
+    const variables = {};
+    Object.keys(rawVars).forEach(function(k) {
+      const key = (k.startsWith('#{') && k.endsWith('}')) ? k : ('#{' + k + '}');
+      variables[key] = rawVars[k];
+    });
+
+    // ── 단건 발송 엔드포인트 사용 ─────────────────────────────
     const solapiPayload = {
       message: {
         to:   msg.to,
         from: msg.from,
         type: 'ATA',
         text: msg.text || '',
-        kakaoOptions: msg.kakaoOptions || {}
+        kakaoOptions: {
+          pfId:       (msg.kakaoOptions && msg.kakaoOptions.pfId)       || '',
+          templateId: (msg.kakaoOptions && msg.kakaoOptions.templateId) || '',
+          variables:  variables
+        }
       }
     };
 
     console.log('[솔라피 요청]', JSON.stringify(solapiPayload));
+    console.log('[변수 매핑]', JSON.stringify(variables));
 
     const solapiRes = await fetch('https://api.solapi.com/messages/v4/send', {
       method: 'POST',
