@@ -938,11 +938,8 @@ function statusBadge(s) {
 
 function isRevenu(b) {
   if (b.status !== 'done') return false;
-  if (b.ticketId) return false;
-  if (b.type === '이용권차감') return false;
-  if (b.payMethod === 'ticket') return false;
+  // 이용권차감도 매출로 집계 (금액권만, 횟수권은 price=0이므로 자동 제외)
   if (b.unpaid) return false;
-  if (b.id && ticketHistory.some(function(h){ return h.bookingId === b.id; })) return false;
   if (b.service && b.service.indexOf('회원권') !== -1) return false;
   return true;
 }
@@ -3171,6 +3168,18 @@ function saveBooking() {
     sendBookingConfirmed(b);
   }
   if (isEdit && prevStatus !== 'cancelled' && status === 'cancelled') {
+    // 이용권 차감 복원
+    var histIdx = ticketHistory.findIndex(function(h){ return h.bookingId === b.id; });
+    if (histIdx !== -1) {
+      var hist = ticketHistory[histIdx];
+      var tkt = getTicketById(hist.ticketId);
+      if (tkt) {
+        tkt.remain = (+tkt.remain||0) + (+hist.amount||0);
+        if (tkt.remain > 0) tkt.closed = false;
+        showToast('이용권 ' + (tkt.type==='money' ? fmtMoney(hist.amount) : hist.amount+'회') + ' 복원됨');
+      }
+      ticketHistory.splice(histIdx, 1);
+    }
     sendBookingCancelled(b);
   }
   
