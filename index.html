@@ -2,444 +2,445 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#4caf50">
+<meta name="theme-color" content="#2d5a27">
 <title>라임스킨</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --primary: #4caf50;
-  --primary-dark: #388e3c;
-  --primary-light: #e8f5e9;
-  --primary-xlight: #f1faf1;
-  --accent: #ff7043;
-  --accent-light: #fff3f0;
-  --text: #1a2a1a;
-  --text-sub: #5a7a5a;
-  --text-muted: #9ab09a;
-  --bg: #f5faf5;
-  --card: #ffffff;
-  --border: #d4e8d4;
-  --border-light: #eaf4ea;
-  --danger: #e53935;
-  --warning: #f57c00;
-  --info: #1976d2;
-  --shadow-sm: 0 1px 4px rgba(76,175,80,0.08);
-  --shadow: 0 4px 16px rgba(76,175,80,0.12);
-  --shadow-lg: 0 8px 32px rgba(76,175,80,0.18);
-  --radius: 14px;
-  --radius-sm: 8px;
-  --tab-h: 64px;
-  --header-h: 56px;
-  --max-w: 600px;
-}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;background:#e8f0e8;font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--text);font-size:15px;}
-#app{max-width:var(--max-w);margin:0 auto;height:100vh;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 0 40px rgba(0,0,0,0.15);}
+:root{
+  --g1:#1a3d15;--g2:#2d5a27;--g3:#4a8c3f;--g4:#6db56a;--g5:#a8d8a5;--g6:#d4edd2;--g7:#edf7ec;--g8:#f7fbf6;
+  --cream:#faf8f4;--beige:#f0ebe0;--sand:#e8dfc8;
+  --text:#1c2b1a;--text2:#4a6047;--text3:#8aaa86;--textw:#ffffff;
+  --red:#c0392b;--orange:#d35400;--blue:#1a5276;
+  --r:16px;--rs:10px;--tabh:62px;--hh:52px;
+  --shadow:0 2px 12px rgba(26,61,21,0.10);
+  --shadow2:0 4px 24px rgba(26,61,21,0.16);
+}
+html,body{height:100%;background:#c8d8c5;font-family:'Noto Sans KR',sans-serif;color:var(--text);}
+#app{max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;background:var(--cream);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,0.2);}
 
-/* Header */
-.app-header{height:var(--header-h);background:var(--card);border-bottom:1px solid var(--border-light);display:flex;align-items:center;padding:0 16px;gap:8px;position:sticky;top:0;z-index:100;flex-shrink:0;}
-.app-header h1{font-size:20px;font-weight:800;color:var(--primary-dark);letter-spacing:-0.5px;flex:1;}
-.app-header h1 span{color:var(--primary);font-weight:400;font-size:14px;margin-left:6px;}
-.header-btn{background:none;border:none;cursor:pointer;padding:8px;border-radius:50%;color:var(--text-sub);font-size:20px;display:flex;align-items:center;justify-content:center;transition:background 0.15s;}
-.header-btn:active{background:var(--primary-light);}
+/* ── LOADING ── */
+#loading{position:fixed;inset:0;background:var(--g2);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+#loading .logo{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;}
+#loading .logo span{color:var(--g5);}
+.spin{width:36px;height:36px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-/* Page content */
+/* ── HEADER ── */
+.hd{height:var(--hh);background:var(--g2);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;position:relative;z-index:50;}
+.hd-back{width:36px;height:36px;border:none;background:rgba(255,255,255,0.15);border-radius:50%;color:#fff;font-size:16px;cursor:pointer;display:none;align-items:center;justify-content:center;flex-shrink:0;}
+.hd-back.show{display:flex;}
+.hd-title{flex:1;font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.3px;}
+.hd-action{border:none;background:rgba(255,255,255,0.15);color:#fff;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;display:none;font-family:inherit;}
+.hd-action.show{display:block;}
+
+/* ── PAGES ── */
 #pages{flex:1;overflow:hidden;position:relative;}
-.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--tab-h) + 8px);display:none;}
-.page.active{display:block;animation:fadeIn 0.2s ease;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:none;padding-bottom:calc(var(--tabh)+12px);background:var(--cream);}
+.page.active{display:block;}
+.page-enter{animation:pgIn .22s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateX(18px);}to{opacity:1;transform:none;}}
 
-/* Bottom tabs */
-.tabs{height:var(--tab-h);background:var(--card);border-top:1px solid var(--border-light);display:flex;align-items:stretch;flex-shrink:0;position:relative;z-index:100;}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--text-muted);font-size:10px;font-weight:500;transition:color 0.15s;padding:6px 0;}
-.tab svg{width:22px;height:22px;transition:transform 0.2s;}
-.tab.active{color:var(--primary);}
-.tab.active svg{transform:translateY(-1px);}
+/* ── TABS ── */
+.tabs{height:var(--tabh);background:#fff;border-top:1px solid #e8f0e6;display:flex;flex-shrink:0;position:relative;z-index:50;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--text3);font-size:10px;font-weight:500;padding:6px 0;transition:color .15s;font-family:inherit;}
+.tab.on{color:var(--g2);}
+.tab svg{width:22px;height:22px;}
+.tab-dot{width:4px;height:4px;border-radius:50%;background:var(--g3);margin-top:1px;opacity:0;}
+.tab.on .tab-dot{opacity:1;}
 
-/* Cards */
-.card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-sm);border:1px solid var(--border-light);}
-.section{padding:12px 14px 0;}
-.section-title{font-size:13px;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+/* ── TOAST ── */
+#toast{position:fixed;bottom:calc(var(--tabh)+16px);left:50%;transform:translateX(-50%) translateY(8px);background:rgba(20,40,18,0.92);color:#fff;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:500;z-index:9000;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.err{background:rgba(180,30,20,0.92);}
 
-/* Badges */
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
-.badge-green{background:var(--primary-light);color:var(--primary-dark);}
-.badge-orange{background:#fff3e0;color:#e65100;}
-.badge-red{background:#ffebee;color:#c62828;}
-.badge-blue{background:#e3f2fd;color:#1565c0;}
-.badge-gray{background:#f5f5f5;color:#555;}
-.badge-purple{background:#f3e5f5;color:#6a1b9a;}
+/* ── CARDS ── */
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;}
+.section{padding:14px 14px 4px;}
+.sec-title{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
 
-/* Status badges */
-.status-pending{background:#fff3e0;color:#e65100;}
-.status-confirmed{background:var(--primary-light);color:var(--primary-dark);}
-.status-done{background:#e8eaf6;color:#3949ab;}
-.status-cancelled{background:#fafafa;color:#9e9e9e;text-decoration:line-through;}
+/* ── HOME ── */
+.home-banner{background:linear-gradient(145deg,var(--g1) 0%,var(--g3) 100%);padding:20px 18px 22px;position:relative;overflow:hidden;}
+.home-banner::after{content:'';position:absolute;right:-30px;top:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.05);}
+.hb-date{font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:3px;}
+.hb-shop{font-size:22px;font-weight:900;color:#fff;letter-spacing:-0.5px;margin-bottom:18px;}
+.hb-sales{background:rgba(255,255,255,0.12);border-radius:12px;padding:14px 16px;backdrop-filter:blur(4px);}
+.hb-sales-label{font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:4px;}
+.hb-sales-amount{font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1;}
+.goal-bar{height:5px;background:rgba(255,255,255,0.2);border-radius:3px;margin-top:10px;overflow:hidden;}
+.goal-fill{height:100%;background:#fff;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+.goal-text{font-size:11px;color:rgba(255,255,255,0.65);margin-top:5px;}
 
-/* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
-.btn-primary{background:var(--primary);color:#fff;}
-.btn-primary:active{background:var(--primary-dark);}
-.btn-outline{background:none;border:1.5px solid var(--border);color:var(--text-sub);}
-.btn-outline:active{background:var(--primary-light);}
-.btn-danger{background:var(--danger);color:#fff;}
-.btn-sm{padding:6px 12px;font-size:13px;border-radius:6px;}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;}
+.qbtn{background:#fff;border:none;border-radius:var(--r);padding:16px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:var(--shadow);text-align:left;transition:transform .12s,box-shadow .12s;font-family:inherit;}
+.qbtn:active{transform:scale(0.97);box-shadow:none;}
+.qbtn-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.qbtn-label{font-size:14px;font-weight:700;color:var(--text);}
+
+/* ── LIST ITEM ── */
+.li{display:flex;align-items:center;gap:12px;padding:13px 14px;background:#fff;border-bottom:1px solid #f0f4ef;cursor:pointer;transition:background .1s;}
+.li:last-child{border-bottom:none;}
+.li:active{background:var(--g7);}
+.li-av{width:42px;height:42px;border-radius:50%;background:var(--g6);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--g2);font-size:16px;flex-shrink:0;}
+.li-info{flex:1;min-width:0;}
+.li-name{font-size:14px;font-weight:700;color:var(--text);}
+.li-sub{font-size:12px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.li-right{text-align:right;flex-shrink:0;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;line-height:1.6;}
+.b-green{background:var(--g6);color:var(--g2);}
+.b-orange{background:#fdebd0;color:#a04000;}
+.b-red{background:#fdecea;color:#a93226;}
+.b-blue{background:#d6eaf8;color:#1a5276;}
+.b-gray{background:#f2f3f4;color:#626567;}
+.b-purple{background:#f0e6fa;color:#6c3483;}
+
+/* ── BOOKING STATUS ── */
+.s-pending{background:#fef9e7;color:#b7950b;}
+.s-confirmed{background:var(--g6);color:var(--g2);}
+.s-done{background:#d6eaf8;color:#1a5276;}
+.s-cancelled{background:#f2f3f4;color:#999;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 20px;border-radius:var(--rs);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap;}
+.btn-primary{background:var(--g2);color:#fff;}
+.btn-primary:active{background:var(--g1);}
+.btn-outline{background:#fff;border:1.5px solid var(--g6);color:var(--text2);}
+.btn-outline:active{background:var(--g7);}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-sm{padding:7px 14px;font-size:13px;border-radius:8px;}
+.btn-xs{padding:5px 10px;font-size:12px;border-radius:6px;}
+.btn-block{width:100%;}
 .btn-icon{width:36px;height:36px;padding:0;border-radius:50%;}
-.fab{position:fixed;bottom:calc(var(--tab-h) + 16px);right:max(16px, calc(50% - var(--max-w)/2 + 16px));width:52px;height:52px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;font-size:24px;z-index:200;transition:transform 0.2s;}
-.fab:active{transform:scale(0.93);}
 
-/* List items */
-.list-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border-bottom:1px solid var(--border-light);cursor:pointer;transition:background 0.1s;}
-.list-item:active{background:var(--primary-xlight);}
-.list-item:last-child{border-bottom:none;}
-.list-item .avatar{width:40px;height:40px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary-dark);font-size:15px;flex-shrink:0;}
-.list-item .info{flex:1;min-width:0;}
-.list-item .info .name{font-weight:600;font-size:14px;}
-.list-item .info .sub{font-size:12px;color:var(--text-sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.list-item .right{text-align:right;flex-shrink:0;}
+/* ── CALENDAR ── */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;}
+.cal-nav h2{font-size:18px;font-weight:900;color:var(--text);}
+.cal-nav-btn{width:34px;height:34px;border:none;background:var(--g7);border-radius:50%;cursor:pointer;font-size:16px;color:var(--g2);display:flex;align-items:center;justify-content:center;}
+.cal-head{display:grid;grid-template-columns:repeat(7,1fr);padding:0 10px;}
+.cal-dh{text-align:center;font-size:11px;font-weight:700;color:var(--text3);padding:4px 0;}
+.cal-dh:first-child{color:var(--red);}
+.cal-dh:last-child{color:var(--blue);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:0 10px 10px;}
+.cal-cell{text-align:center;padding:3px 2px;cursor:pointer;min-height:48px;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.cal-cell .dn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:14px;font-weight:500;transition:background .1s;}
+.cal-cell:nth-child(7n+1) .dn{color:var(--red);}
+.cal-cell:nth-child(7n) .dn{color:var(--blue);}
+.cal-cell.today .dn{background:var(--g5);color:var(--g1);font-weight:900;}
+.cal-cell.selected .dn{background:var(--g2);color:#fff;font-weight:900;}
+.cal-cell.today.selected .dn{background:var(--g1);}
+.cal-cell.other .dn{color:#ccc;}
+.cal-cell:nth-child(7n+1).other .dn,.cal-cell:nth-child(7n).other .dn{color:#ddd;}
+.cal-dots{display:flex;gap:2px;justify-content:center;}
+.cal-dot{width:5px;height:5px;border-radius:50%;background:var(--g4);}
+.sel-day-bar{background:#fff;border-top:1px solid #edf3ec;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;}
+.sel-day-bar span{font-size:14px;font-weight:700;color:var(--text);}
 
-/* Forms */
+/* ── SEARCH ── */
+.search-wrap{padding:12px 14px;background:#fff;border-bottom:1px solid #edf3ec;}
+.search-inp{width:100%;padding:9px 14px 9px 38px;border:1.5px solid var(--g6);border-radius:30px;font-size:14px;background:var(--g8);outline:none;font-family:inherit;color:var(--text);transition:border-color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238aaa86' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:12px center;}
+.search-inp:focus{border-color:var(--g3);background-color:#fff;}
+
+/* ── TICKET CARD ── */
+.tk-card{background:#fff;border-radius:var(--r);padding:16px;box-shadow:var(--shadow);margin-bottom:10px;cursor:pointer;transition:transform .12s;}
+.tk-card:active{transform:scale(0.98);}
+.tk-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.tk-name{font-size:15px;font-weight:700;color:var(--text);}
+.tk-member{font-size:12px;color:var(--text3);margin-top:2px;}
+.tk-bar{height:8px;background:var(--g7);border-radius:4px;overflow:hidden;margin:6px 0;}
+.tk-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.tk-fill-hi{background:linear-gradient(90deg,var(--g3),var(--g4));}
+.tk-fill-md{background:linear-gradient(90deg,#e67e22,#f39c12);}
+.tk-fill-lo{background:linear-gradient(90deg,var(--red),#e74c3c);}
+.tk-stats{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);}
+.tk-stats strong{color:var(--text);font-size:14px;}
+
+/* ── FORM ── */
 .form-group{margin-bottom:14px;}
-.form-label{display:block;font-size:12px;font-weight:600;color:var(--text-sub);margin-bottom:6px;}
-.form-control{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);background:var(--card);outline:none;transition:border-color 0.15s;font-family:inherit;}
-.form-control:focus{border-color:var(--primary);}
-textarea.form-control{resize:vertical;min-height:70px;}
-select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ab09a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;}
+.form-ctrl{width:100%;padding:11px 13px;border:1.5px solid #e0e8df;border-radius:var(--rs);font-size:14px;color:var(--text);background:#fff;outline:none;transition:border-color .15s;font-family:inherit;}
+.form-ctrl:focus{border-color:var(--g3);}
+textarea.form-ctrl{resize:vertical;min-height:72px;}
+select.form-ctrl{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238aaa86' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
-/* Modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:500;display:none;align-items:flex-end;justify-content:center;}
-.modal-overlay.open{display:flex;animation:overlayIn 0.2s ease;}
-@keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
-.modal{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:var(--max-w);max-height:90vh;overflow-y:auto;padding:20px 16px 32px;animation:slideUp 0.25s cubic-bezier(0.34,1.2,0.64,1);}
-@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
-.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
-.modal-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:20px;}
+/* ── CUSTOM SELECT ── */
+.cs-wrap{position:relative;}
+.cs-btn{width:100%;padding:11px 13px;border:1.5px solid #e0e8df;border-radius:var(--rs);font-size:14px;color:var(--text);background:#fff;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:inherit;}
+.cs-btn:focus{outline:2px solid var(--g3);}
+.cs-arrow{color:var(--text3);font-size:11px;transition:transform .2s;}
+.cs-btn.open .cs-arrow{transform:rotate(180deg);}
+.cs-drop{position:absolute;top:calc(100%+4px);left:0;right:0;background:#fff;border:1.5px solid #e0e8df;border-radius:var(--rs);z-index:200;max-height:230px;overflow-y:auto;box-shadow:var(--shadow2);display:none;}
+.cs-drop.open{display:block;animation:dropIn .15s ease;}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+.cs-search{padding:8px;border-bottom:1px solid #f0f4ef;}
+.cs-search input{width:100%;padding:7px 10px;border:1.5px solid #e0e8df;border-radius:6px;font-size:13px;outline:none;font-family:inherit;}
+.cs-opt{padding:11px 13px;cursor:pointer;font-size:14px;transition:background .1s;}
+.cs-opt:hover,.cs-opt.hi{background:var(--g7);}
+.cs-opt-sub{font-size:11px;color:var(--text3);margin-top:1px;}
 
-/* Slide Panel */
-.panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:400;display:none;}
-.panel-overlay.open{display:block;animation:overlayIn 0.2s ease;}
-.slide-panel{position:fixed;top:0;right:0;width:min(100%,var(--max-w));height:100vh;background:var(--bg);z-index:401;transform:translateX(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;padding-bottom:24px;}
-.slide-panel.open{transform:translateX(0);}
-.panel-header{height:56px;background:var(--card);border-bottom:1px solid var(--border-light);display:flex;align-items:center;padding:0 16px;gap:10px;position:sticky;top:0;z-index:10;}
-.panel-header h2{flex:1;font-size:17px;font-weight:800;}
-.panel-body{padding:12px 14px;}
+/* ── MODAL ── */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.modal-ov.open{display:flex;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--cream);border-radius:22px 22px 0 0;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;padding:0 0 36px;animation:slideUp .25s cubic-bezier(.34,1.2,.64,1);}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:none;}}
+.modal-bar{width:38px;height:4px;background:#ddd;border-radius:2px;margin:14px auto 0;}
+.modal-hd{padding:16px 18px 18px;border-bottom:1px solid #edf3ec;display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:18px;font-weight:900;color:var(--text);}
+.modal-close{width:32px;height:32px;border:none;background:var(--g7);border-radius:50%;cursor:pointer;font-size:16px;color:var(--text2);display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:18px 18px 0;}
 
-/* Toast */
-#toast{position:fixed;bottom:calc(var(--tab-h) + 80px);left:50%;transform:translateX(-50%) translateY(20px);background:rgba(30,50,30,0.9);color:#fff;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:1000;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;max-width:calc(var(--max-w) - 32px);}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-#toast.error{background:rgba(200,30,30,0.92);}
+/* ── PANEL ── */
+.panel-ov{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:400;display:none;}
+.panel-ov.open{display:block;animation:fadeIn .2s ease;}
+.panel{position:fixed;top:0;right:0;width:min(100%,430px);height:100vh;background:var(--cream);z-index:401;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;display:flex;flex-direction:column;}
+.panel.open{transform:none;}
+.panel-hd{height:52px;background:var(--g2);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:10;}
+.panel-hd h2{flex:1;font-size:17px;font-weight:700;color:#fff;}
+.panel-back{width:34px;height:34px;border:none;background:rgba(255,255,255,0.15);border-radius:50%;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.panel-body{flex:1;padding:14px;}
 
-/* Loading */
-#loading{position:fixed;inset:0;background:rgba(245,250,245,0.95);z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
-.spinner{width:44px;height:44px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-#loading p{color:var(--text-sub);font-size:14px;font-weight:600;}
+/* ── INNER TABS ── */
+.inner-tabs{display:flex;background:#fff;border-bottom:1px solid #edf3ec;flex-shrink:0;}
+.inner-tab{flex:1;padding:12px 0;text-align:center;font-size:13px;font-weight:700;color:var(--text3);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .15s;}
+.inner-tab.on{color:var(--g2);border-bottom-color:var(--g2);}
 
-/* HOME PAGE */
-.home-hero{background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;padding:20px 16px 24px;margin:0;}
-.home-hero .date-label{font-size:13px;opacity:0.8;margin-bottom:4px;}
-.home-hero .shop-name{font-size:22px;font-weight:800;margin-bottom:16px;}
-.sales-card{background:rgba(255,255,255,0.15);border-radius:12px;padding:14px;}
-.sales-card .amount{font-size:28px;font-weight:800;letter-spacing:-1px;}
-.sales-card .goal-bar{height:6px;background:rgba(255,255,255,0.2);border-radius:3px;margin-top:10px;overflow:hidden;}
-.sales-card .goal-fill{height:100%;background:#fff;border-radius:3px;transition:width 0.6s ease;}
-.sales-card .goal-text{font-size:11px;opacity:0.8;margin-top:6px;}
-.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;}
-.quick-btn{background:var(--card);border:1.5px solid var(--border-light);border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);box-shadow:var(--shadow-sm);}
-.quick-btn:active{background:var(--primary-xlight);}
-.quick-btn .icon{width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:18px;}
-.today-booking-item{padding:12px 14px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:12px;cursor:pointer;}
-.today-booking-item:active{background:var(--primary-xlight);}
-.booking-time{font-size:13px;font-weight:700;color:var(--primary-dark);width:42px;flex-shrink:0;}
-.booking-info{flex:1;min-width:0;}
-.booking-info .bname{font-size:14px;font-weight:600;}
-.booking-info .bsub{font-size:12px;color:var(--text-sub);}
-.empty-state{text-align:center;padding:32px 20px;color:var(--text-muted);}
-.empty-state .icon{font-size:36px;margin-bottom:8px;}
-.empty-state p{font-size:14px;}
+/* ── MORE MENU ── */
+.mm-item{display:flex;align-items:center;gap:14px;padding:15px 16px;background:#fff;border-bottom:1px solid #f0f4ef;cursor:pointer;transition:background .1s;}
+.mm-item:last-child{border-bottom:none;}
+.mm-item:active{background:var(--g7);}
+.mm-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.mm-label{flex:1;font-size:15px;font-weight:600;color:var(--text);}
+.mm-arr{color:var(--text3);font-size:18px;}
 
-/* CALENDAR PAGE */
-.calendar-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;}
-.calendar-nav h2{font-size:18px;font-weight:800;color:var(--text);}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:0 10px;}
-.cal-day-header{text-align:center;font-size:11px;font-weight:700;color:var(--text-sub);padding:4px 0;}
-.cal-day-header:first-child{color:#e53935;}
-.cal-day-header:last-child{color:#1976d2;}
-.cal-day{text-align:center;padding:4px 2px;cursor:pointer;border-radius:8px;min-height:46px;position:relative;}
-.cal-day .d{font-size:14px;font-weight:500;margin-bottom:2px;}
-.cal-day .dot{font-size:10px;color:var(--primary-dark);font-weight:700;}
-.cal-day.today .d{background:var(--primary);color:#fff;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;}
-.cal-day.selected .d{background:var(--primary-dark);color:#fff;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;}
-.cal-day.other-month .d{color:var(--text-muted);}
-.cal-day:first-child .d{color:#e53935;}
-.cal-day:nth-child(7n+1) .d{color:#e53935;}
-.cal-day:nth-child(7n) .d{color:#1976d2;}
-.cal-day.today .d,.cal-day.selected .d{color:#fff!important;}
-.selected-day-bookings{background:var(--card);border-top:1px solid var(--border-light);}
-.selected-day-header{padding:12px 14px;font-size:14px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;}
+/* ── STAT ── */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;}
+.stat-card{background:#fff;border-radius:var(--r);padding:16px;box-shadow:var(--shadow);}
+.stat-label{font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px;letter-spacing:.5px;}
+.stat-val{font-size:22px;font-weight:900;color:var(--text);letter-spacing:-0.5px;}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:3px;}
 
-/* MEMBER PAGE */
-.search-bar{padding:12px 14px;background:var(--card);border-bottom:1px solid var(--border-light);}
-.search-input{width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:30px;font-size:14px;background:var(--bg);outline:none;font-family:inherit;}
-.search-input:focus{border-color:var(--primary);}
-
-/* TICKET PAGE */
-.ticket-card{background:var(--card);border-radius:var(--radius);padding:16px;border:1.5px solid var(--border-light);margin-bottom:10px;cursor:pointer;transition:box-shadow 0.15s;}
-.ticket-card:active{box-shadow:var(--shadow);}
-.ticket-card .tc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
-.ticket-card .tc-name{font-size:15px;font-weight:700;}
-.ticket-card .tc-member{font-size:12px;color:var(--text-sub);margin-top:2px;}
-.ticket-bar{height:8px;background:var(--border-light);border-radius:4px;overflow:hidden;margin:8px 0;}
-.ticket-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#66bb6a);transition:width 0.5s ease;}
-.ticket-fill.low{background:linear-gradient(90deg,#ff9800,#ffa726);}
-.ticket-fill.critical{background:linear-gradient(90deg,#e53935,#ef5350);}
-.ticket-stats{display:flex;justify-content:space-between;font-size:12px;color:var(--text-sub);}
-.ticket-stats strong{color:var(--text);font-size:14px;}
-
-/* STATS */
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;}
-.stat-card{background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid var(--border-light);}
-.stat-card .s-label{font-size:11px;color:var(--text-sub);font-weight:600;margin-bottom:4px;}
-.stat-card .s-value{font-size:20px;font-weight:800;color:var(--text);}
-.stat-card .s-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
-
-/* More menu */
-.more-menu-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border-bottom:1px solid var(--border-light);cursor:pointer;}
-.more-menu-item:active{background:var(--primary-xlight);}
-.more-menu-item .mi-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.more-menu-item .mi-label{font-size:14px;font-weight:600;flex:1;}
-.more-menu-item .mi-arrow{color:var(--text-muted);font-size:12px;}
-
-/* Custom dropdown */
-.custom-select{position:relative;}
-.custom-select-btn{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);background:var(--card);text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
-.custom-select-btn:focus{outline:2px solid var(--primary);}
-.custom-select-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);z-index:300;max-height:220px;overflow-y:auto;box-shadow:var(--shadow);}
-.custom-select-search{padding:8px;border-bottom:1px solid var(--border-light);}
-.custom-select-search input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;outline:none;}
-.custom-select-option{padding:10px 12px;cursor:pointer;font-size:14px;}
-.custom-select-option:hover,.custom-select-option.highlighted{background:var(--primary-xlight);}
-.custom-select-option .opt-sub{font-size:11px;color:var(--text-sub);}
-.custom-select-dropdown.hidden{display:none;}
-
-/* Tabs inside panel */
-.inner-tabs{display:flex;border-bottom:1px solid var(--border-light);background:var(--card);}
-.inner-tab{flex:1;padding:11px 0;text-align:center;font-size:13px;font-weight:600;color:var(--text-sub);cursor:pointer;border-bottom:2.5px solid transparent;}
-.inner-tab.active{color:var(--primary);border-bottom-color:var(--primary);}
-
-/* Divider */
-.divider{height:8px;background:var(--border-light);}
-
-/* Misc */
-.text-center{text-align:center;}
-.text-right{text-align:right;}
-.fw-bold{font-weight:700;}
-.text-primary{color:var(--primary-dark);}
-.text-muted{color:var(--text-muted);}
-.text-danger{color:var(--danger);}
-.flex{display:flex;align-items:center;}
-.flex-between{display:flex;align-items:center;justify-content:space-between;}
-.gap-8{gap:8px;}
-.mt-8{margin-top:8px;}
-.mt-12{margin-top:12px;}
-.mb-8{margin-bottom:8px;}
-.p-14{padding:14px;}
-.amount-positive{color:var(--primary-dark);font-weight:700;}
-.amount-negative{color:var(--danger);font-weight:700;}
-.chip-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
-.chip{padding:4px 10px;border-radius:20px;font-size:12px;background:var(--primary-light);color:var(--primary-dark);font-weight:600;cursor:pointer;}
-.chip.active,.chip:not(.readonly){border:1px solid var(--primary);}
+/* ── UTILS ── */
+.divider{height:10px;background:var(--beige);}
+.empty{text-align:center;padding:36px 20px;color:var(--text3);}
+.empty-icon{font-size:38px;margin-bottom:10px;}
+.empty p{font-size:14px;}
+.fw7{font-weight:700;}
+.fw9{font-weight:900;}
+.text-g{color:var(--g2);}
+.text-r{color:var(--red);}
+.text-m{color:var(--text3);}
+.row{display:flex;align-items:center;}
+.row-between{display:flex;align-items:center;justify-content:space-between;}
+.mt4{margin-top:4px;}
+.mt8{margin-top:8px;}
+.mt12{margin-top:12px;}
+.mt16{margin-top:16px;}
+.mb8{margin-bottom:8px;}
+.mb12{margin-bottom:12px;}
+.gap8{gap:8px;}
+.p14{padding:14px;}
+.px14{padding:0 14px;}
 </style>
 </head>
 <body>
 <div id="app">
-  <!-- Loading -->
-  <div id="loading">
-    <div class="spinner"></div>
-    <p>데이터 불러오는 중...</p>
-  </div>
 
-  <!-- Toast -->
-  <div id="toast"></div>
-
-  <!-- Header -->
-  <header class="app-header">
-    <h1 id="headerTitle">라임스킨 <span id="headerSub"></span></h1>
-    <button class="header-btn" id="headerRightBtn" onclick="headerRightAction()" style="display:none">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
-  </header>
-
-  <!-- Pages -->
-  <div id="pages">
-    <!-- HOME -->
-    <div class="page active" id="page-home">
-      <div class="home-hero">
-        <div class="date-label" id="heroDate"></div>
-        <div class="shop-name" id="heroShopName">라임스킨</div>
-        <div class="sales-card">
-          <div style="font-size:12px;opacity:0.8;margin-bottom:4px">이번달 매출</div>
-          <div class="amount" id="heroSales">₩0</div>
-          <div class="goal-bar"><div class="goal-fill" id="heroGoalFill" style="width:0%"></div></div>
-          <div class="goal-text" id="heroGoalText">목표: ₩0</div>
-        </div>
-      </div>
-      <div class="quick-actions">
-        <button class="quick-btn" onclick="openAddBooking()">
-          <div class="icon">📅</div><span>예약 추가</span>
-        </button>
-        <button class="quick-btn" onclick="openAddMember()">
-          <div class="icon">👤</div><span>회원 추가</span>
-        </button>
-        <button class="quick-btn" onclick="openAddTicket()">
-          <div class="icon">🎫</div><span>이용권 추가</span>
-        </button>
-        <button class="quick-btn" onclick="showTab('stats')">
-          <div class="icon">📊</div><span>매출 통계</span>
-        </button>
-      </div>
-      <div class="section">
-        <div class="section-title">📅 오늘 예약</div>
-      </div>
-      <div id="todayBookings" class="card" style="margin:0 14px 14px;padding:0;overflow:hidden;"></div>
-
-      <div class="section">
-        <div class="section-title">🎫 이용권 현황</div>
-      </div>
-      <div id="homeTickets" style="padding:0 14px 14px;"></div>
-    </div>
-
-    <!-- BOOKING -->
-    <div class="page" id="page-booking">
-      <div class="calendar-nav">
-        <button class="btn btn-outline btn-sm" onclick="changeMonth(-1)">◀</button>
-        <h2 id="calMonthTitle"></h2>
-        <button class="btn btn-outline btn-sm" onclick="changeMonth(1)">▶</button>
-      </div>
-      <div class="calendar-grid" id="calDayHeaders"></div>
-      <div class="calendar-grid" id="calGrid"></div>
-      <div class="selected-day-bookings">
-        <div class="selected-day-header">
-          <span id="selectedDayLabel">날짜를 선택하세요</span>
-          <button class="btn btn-primary btn-sm" onclick="openAddBooking()">+ 예약</button>
-        </div>
-        <div id="selectedDayList"></div>
-      </div>
-    </div>
-
-    <!-- MEMBER -->
-    <div class="page" id="page-member">
-      <div class="search-bar">
-        <input type="search" class="search-input" id="memberSearch" placeholder="🔍  이름, 전화번호 검색..." oninput="renderMembers()">
-      </div>
-      <div id="memberList"></div>
-    </div>
-
-    <!-- TICKET -->
-    <div class="page" id="page-ticket">
-      <div class="search-bar">
-        <input type="search" class="search-input" id="ticketSearch" placeholder="🔍  회원명, 이용권명 검색..." oninput="renderTickets()">
-      </div>
-      <div id="ticketList" style="padding:12px 14px;"></div>
-    </div>
-
-    <!-- MORE -->
-    <div class="page" id="page-more">
-      <div style="padding:14px 14px 6px;font-size:13px;font-weight:700;color:var(--text-sub);">관리</div>
-      <div id="moreMenuList"></div>
-    </div>
-  </div>
-
-  <!-- Bottom Tabs -->
-  <nav class="tabs">
-    <button class="tab active" onclick="showTab('home')" data-tab="home">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      홈
-    </button>
-    <button class="tab" onclick="showTab('booking')" data-tab="booking">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
-      예약
-    </button>
-    <button class="tab" onclick="showTab('member')" data-tab="member">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      회원
-    </button>
-    <button class="tab" onclick="showTab('ticket')" data-tab="ticket">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 10V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v4c1.1 0 2 .9 2 2s-.9 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-2-1.46c-1.19.69-2 1.99-2 3.46s.81 2.77 2 3.46V18H4v-2.54c1.19-.69 2-1.99 2-3.46 0-1.48-.8-2.77-2-3.46V6h16v2.54z"/></svg>
-      이용권
-    </button>
-    <button class="tab" onclick="showTab('more')" data-tab="more">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-      더보기
-    </button>
-  </nav>
+<!-- LOADING -->
+<div id="loading">
+  <div class="logo">라임<span>스킨</span></div>
+  <div class="spin"></div>
 </div>
 
-<!-- =========== MODALS =========== -->
+<!-- TOAST -->
+<div id="toast"></div>
 
-<!-- 예약 추가/수정 모달 -->
-<div class="modal-overlay" id="modalBooking">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="modalBookingTitle">예약 추가</div>
+<!-- HEADER -->
+<header class="hd">
+  <button class="hd-back" id="hdBack" onclick="goBack()">←</button>
+  <div class="hd-title" id="hdTitle">라임스킨</div>
+  <button class="hd-action" id="hdAction" onclick="hdActionFn()"></button>
+</header>
+
+<!-- PAGES -->
+<div id="pages">
+
+  <!-- HOME -->
+  <div class="page active" id="pg-home">
+    <div class="home-banner">
+      <div class="hb-date" id="hbDate"></div>
+      <div class="hb-shop" id="hbShop">라임스킨</div>
+      <div class="hb-sales">
+        <div class="hb-sales-label">이번달 매출</div>
+        <div class="hb-sales-amount" id="hbAmt">₩0</div>
+        <div class="goal-bar"><div class="goal-fill" id="hbGoal" style="width:0%"></div></div>
+        <div class="goal-text" id="hbGoalTxt"></div>
+      </div>
+    </div>
+    <div class="quick-grid">
+      <button class="qbtn" onclick="openBookingModal()">
+        <div class="qbtn-icon" style="background:#e8f5e9">📅</div>
+        <div class="qbtn-label">예약 추가</div>
+      </button>
+      <button class="qbtn" onclick="openMemberModal()">
+        <div class="qbtn-icon" style="background:#e3f2fd">👤</div>
+        <div class="qbtn-label">회원 추가</div>
+      </button>
+      <button class="qbtn" onclick="openTicketModal()">
+        <div class="qbtn-icon" style="background:#fff3e0">🎫</div>
+        <div class="qbtn-label">이용권 추가</div>
+      </button>
+      <button class="qbtn" onclick="openPanel('stats')">
+        <div class="qbtn-icon" style="background:#fce4ec">📊</div>
+        <div class="qbtn-label">매출 통계</div>
+      </button>
+    </div>
+    <div class="divider"></div>
+    <div class="section"><div class="sec-title">오늘 예약</div></div>
+    <div class="card" style="margin:0 14px 14px;" id="todayList"></div>
+    <div class="divider"></div>
+    <div class="section"><div class="sec-title">활성 이용권</div></div>
+    <div style="padding:0 14px 14px" id="homeTickets"></div>
+  </div>
+
+  <!-- BOOKING -->
+  <div class="page" id="pg-booking">
+    <div style="background:#fff;border-bottom:1px solid #edf3ec;">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="chMonth(-1)">‹</button>
+        <h2 id="calTitle"></h2>
+        <button class="cal-nav-btn" onclick="chMonth(1)">›</button>
+      </div>
+      <div class="cal-head" id="calHead"></div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div class="sel-day-bar">
+      <span id="selDayLabel">날짜를 선택하세요</span>
+      <button class="btn btn-primary btn-sm" onclick="openBookingModal()">+ 예약</button>
+    </div>
+    <div id="selDayList"></div>
+  </div>
+
+  <!-- MEMBER -->
+  <div class="page" id="pg-member">
+    <div class="search-wrap">
+      <input class="search-inp" id="memberQ" placeholder="이름, 연락처 검색..." oninput="renderMembers()">
+    </div>
+    <div id="memberList"></div>
+  </div>
+
+  <!-- TICKET -->
+  <div class="page" id="pg-ticket">
+    <div class="search-wrap">
+      <input class="search-inp" id="ticketQ" placeholder="회원명, 이용권명 검색..." oninput="renderTickets()">
+    </div>
+    <div id="ticketList" style="padding:12px 14px;"></div>
+  </div>
+
+  <!-- MORE -->
+  <div class="page" id="pg-more">
+    <div style="padding:14px 14px 6px;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1px;">관리 메뉴</div>
+    <div class="card" style="margin:0 14px 14px;" id="moreMenu"></div>
+  </div>
+
+</div>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="tab on" onclick="goTab('home')" data-tab="home">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    홈<div class="tab-dot"></div>
+  </button>
+  <button class="tab" onclick="goTab('booking')" data-tab="booking">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+    예약<div class="tab-dot"></div>
+  </button>
+  <button class="tab" onclick="goTab('member')" data-tab="member">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+    회원<div class="tab-dot"></div>
+  </button>
+  <button class="tab" onclick="goTab('ticket')" data-tab="ticket">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 10V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v4c1.1 0 2 .9 2 2s-.9 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2z"/></svg>
+    이용권<div class="tab-dot"></div>
+  </button>
+  <button class="tab" onclick="goTab('more')" data-tab="more">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    더보기<div class="tab-dot"></div>
+  </button>
+</nav>
+
+</div><!-- #app -->
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- 예약 모달 -->
+<div class="modal-ov" id="mBooking">
+<div class="modal">
+  <div class="modal-bar"></div>
+  <div class="modal-hd">
+    <div class="modal-title" id="mBookingTitle">예약 추가</div>
+    <button class="modal-close" onclick="closeModal('mBooking')">✕</button>
+  </div>
+  <div class="modal-body">
     <div class="form-group">
       <label class="form-label">날짜 *</label>
-      <input type="date" class="form-control" id="bDate">
+      <input type="date" class="form-ctrl" id="bDate">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">시간 *</label>
-        <input type="time" class="form-control" id="bTime">
+        <label class="form-label">시간</label>
+        <input type="time" class="form-ctrl" id="bTime">
       </div>
       <div class="form-group">
-        <label class="form-label">소요시간(분)</label>
-        <input type="number" class="form-control" id="bDuration" placeholder="60">
+        <label class="form-label">소요(분)</label>
+        <input type="number" class="form-ctrl" id="bDuration" placeholder="60">
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">고객 (회원 선택 또는 직접입력)</label>
-      <div class="custom-select" id="memberSelectWrap">
-        <button class="custom-select-btn" id="memberSelectBtn" onclick="toggleMemberDropdown()" type="button">
-          <span id="memberSelectText">회원 선택...</span><span>▼</span>
+      <label class="form-label">고객</label>
+      <div class="cs-wrap" id="csMember">
+        <button class="cs-btn" id="csMemberBtn" onclick="toggleCS('csMember')" type="button">
+          <span id="csMemberTxt">회원 선택 또는 직접 입력</span><span class="cs-arrow">▼</span>
         </button>
-        <div class="custom-select-dropdown hidden" id="memberSelectDropdown">
-          <div class="custom-select-search"><input type="text" placeholder="검색..." id="memberDropdownSearch" oninput="filterMemberDropdown()"></div>
-          <div id="memberDropdownList"></div>
+        <div class="cs-drop" id="csMemberDrop">
+          <div class="cs-search"><input type="text" placeholder="검색..." id="csMemberQ" oninput="filterCS('csMember')"></div>
+          <div id="csMemberList"></div>
         </div>
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">이름 *</label>
-        <input type="text" class="form-control" id="bName" placeholder="홍길동">
+        <input type="text" class="form-ctrl" id="bName" placeholder="홍길동">
       </div>
       <div class="form-group">
         <label class="form-label">연락처</label>
-        <input type="tel" class="form-control" id="bPhone" placeholder="010-0000-0000">
+        <input type="tel" class="form-ctrl" id="bPhone" placeholder="010-0000-0000">
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">서비스 *</label>
-      <div class="custom-select" id="serviceSelectWrap">
-        <button class="custom-select-btn" id="serviceSelectBtn" onclick="toggleServiceDropdown()" type="button">
-          <span id="serviceSelectText">서비스 선택...</span><span>▼</span>
+      <label class="form-label">서비스</label>
+      <div class="cs-wrap" id="csService">
+        <button class="cs-btn" id="csServiceBtn" onclick="toggleCS('csService')" type="button">
+          <span id="csServiceTxt">서비스 선택</span><span class="cs-arrow">▼</span>
         </button>
-        <div class="custom-select-dropdown hidden" id="serviceSelectDropdown">
-          <div id="serviceDropdownList"></div>
+        <div class="cs-drop" id="csServiceDrop">
+          <div id="csServiceList"></div>
         </div>
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">금액 (원)</label>
-        <input type="number" class="form-control" id="bPrice" placeholder="0">
+        <input type="number" class="form-ctrl" id="bPrice" placeholder="0">
       </div>
       <div class="form-group">
-        <label class="form-label">결제방식</label>
-        <select class="form-control" id="bPayMethod">
+        <label class="form-label">결제</label>
+        <select class="form-ctrl" id="bPay">
           <option value="card">카드</option>
           <option value="cash">현금</option>
           <option value="transfer">계좌이체</option>
@@ -449,7 +450,7 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
     </div>
     <div class="form-group">
       <label class="form-label">상태</label>
-      <select class="form-control" id="bStatus">
+      <select class="form-ctrl" id="bStatus">
         <option value="pending">대기</option>
         <option value="confirmed">확정</option>
         <option value="done">완료</option>
@@ -458,1769 +459,1248 @@ select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3C
     </div>
     <div class="form-group" id="bTicketWrap" style="display:none">
       <label class="form-label">이용권 사용</label>
-      <select class="form-control" id="bTicket">
-        <option value="">이용권 선택 안 함</option>
-      </select>
+      <select class="form-ctrl" id="bTicket"><option value="">선택 안 함</option></select>
     </div>
     <div class="form-group">
       <label class="form-label">메모</label>
-      <textarea class="form-control" id="bMemo" rows="2" placeholder="특이사항 등"></textarea>
+      <textarea class="form-ctrl" id="bMemo" rows="2"></textarea>
     </div>
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <button class="btn btn-outline" style="flex:1" onclick="closeModal('modalBooking')">취소</button>
+    <div class="row gap8 mt12 mb8">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('mBooking')">취소</button>
       <button class="btn btn-primary" style="flex:2" onclick="saveBooking()">저장</button>
     </div>
-    <div id="bDeleteWrap" style="display:none;margin-top:10px;text-align:center;">
-      <button class="btn btn-sm" style="color:var(--danger);background:none;" onclick="deleteBooking()">예약 삭제</button>
+    <div id="bDelWrap" style="display:none;text-align:center;padding-bottom:4px;">
+      <button onclick="deleteBooking()" style="background:none;border:none;color:var(--red);font-size:13px;cursor:pointer;font-family:inherit;">예약 삭제</button>
     </div>
   </div>
 </div>
+</div>
 
-<!-- 회원 추가/수정 모달 -->
-<div class="modal-overlay" id="modalMember">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="modalMemberTitle">회원 추가</div>
+<!-- 회원 모달 -->
+<div class="modal-ov" id="mMember">
+<div class="modal">
+  <div class="modal-bar"></div>
+  <div class="modal-hd">
+    <div class="modal-title" id="mMemberTitle">회원 추가</div>
+    <button class="modal-close" onclick="closeModal('mMember')">✕</button>
+  </div>
+  <div class="modal-body">
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">이름 *</label>
-        <input type="text" class="form-control" id="mName" placeholder="홍길동">
+        <input type="text" class="form-ctrl" id="mName" placeholder="홍길동">
       </div>
       <div class="form-group">
-        <label class="form-label">연락처 *</label>
-        <input type="tel" class="form-control" id="mPhone" placeholder="010-0000-0000">
+        <label class="form-label">연락처</label>
+        <input type="tel" class="form-ctrl" id="mPhone" placeholder="010-0000-0000">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">생년월일</label>
-        <input type="date" class="form-control" id="mBirthdate">
+        <input type="date" class="form-ctrl" id="mBirth">
       </div>
       <div class="form-group">
         <label class="form-label">성별</label>
-        <select class="form-control" id="mGender">
-          <option value="">선택</option>
-          <option value="여">여</option>
-          <option value="남">남</option>
+        <select class="form-ctrl" id="mGender">
+          <option value="">선택</option><option value="여">여</option><option value="남">남</option>
         </select>
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">메모</label>
-      <textarea class="form-control" id="mMemo" rows="2"></textarea>
+      <textarea class="form-ctrl" id="mMemo" rows="2"></textarea>
     </div>
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <button class="btn btn-outline" style="flex:1" onclick="closeModal('modalMember')">취소</button>
+    <div class="row gap8 mt12 mb8">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('mMember')">취소</button>
       <button class="btn btn-primary" style="flex:2" onclick="saveMember()">저장</button>
     </div>
-    <div id="mDeleteWrap" style="display:none;margin-top:10px;text-align:center;">
-      <button class="btn btn-sm" style="color:var(--danger);background:none;" onclick="deleteMember()">회원 삭제</button>
+    <div id="mDelWrap" style="display:none;text-align:center;padding-bottom:4px;">
+      <button onclick="deleteMember()" style="background:none;border:none;color:var(--red);font-size:13px;cursor:pointer;font-family:inherit;">회원 삭제</button>
     </div>
   </div>
 </div>
+</div>
 
-<!-- 이용권 추가/수정 모달 -->
-<div class="modal-overlay" id="modalTicket">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="modalTicketTitle">이용권 추가</div>
+<!-- 이용권 모달 -->
+<div class="modal-ov" id="mTicket">
+<div class="modal">
+  <div class="modal-bar"></div>
+  <div class="modal-hd">
+    <div class="modal-title" id="mTicketTitle">이용권 추가</div>
+    <button class="modal-close" onclick="closeModal('mTicket')">✕</button>
+  </div>
+  <div class="modal-body">
     <div class="form-group">
       <label class="form-label">회원 *</label>
-      <div class="custom-select" id="ticketMemberSelectWrap">
-        <button class="custom-select-btn" id="ticketMemberSelectBtn" onclick="toggleTicketMemberDropdown()" type="button">
-          <span id="ticketMemberSelectText">회원 선택...</span><span>▼</span>
+      <div class="cs-wrap" id="csTkMember">
+        <button class="cs-btn" id="csTkMemberBtn" onclick="toggleCS('csTkMember')" type="button">
+          <span id="csTkMemberTxt">회원 선택</span><span class="cs-arrow">▼</span>
         </button>
-        <div class="custom-select-dropdown hidden" id="ticketMemberSelectDropdown">
-          <div class="custom-select-search"><input type="text" placeholder="검색..." id="ticketMemberSearch" oninput="filterTicketMemberDropdown()"></div>
-          <div id="ticketMemberDropdownList"></div>
+        <div class="cs-drop" id="csTkMemberDrop">
+          <div class="cs-search"><input type="text" placeholder="검색..." id="csTkMemberQ" oninput="filterCS('csTkMember')"></div>
+          <div id="csTkMemberList"></div>
         </div>
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">이용권 종류</label>
-        <select class="form-control" id="tType" onchange="updateTicketForm()">
+        <label class="form-label">종류</label>
+        <select class="form-ctrl" id="tType" onchange="updateTicketForm()">
           <option value="amount">금액권</option>
           <option value="count">횟수권</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">이용권명</label>
-        <input type="text" class="form-control" id="tName" placeholder="예: 기본 30만권">
+        <input type="text" class="form-ctrl" id="tName" placeholder="예: 30만 선불권">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label" id="tTotalLabel">충전금액 (원)</label>
-        <input type="number" class="form-control" id="tTotal" placeholder="300000">
+        <input type="number" class="form-ctrl" id="tTotal">
       </div>
       <div class="form-group">
         <label class="form-label">실결제금액 (원)</label>
-        <input type="number" class="form-control" id="tPaidAmount" placeholder="270000">
+        <input type="number" class="form-ctrl" id="tPaid">
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">만료일</label>
-      <input type="date" class="form-control" id="tExpireDate">
+      <input type="date" class="form-ctrl" id="tExpire">
     </div>
     <div class="form-group">
       <label class="form-label">메모</label>
-      <textarea class="form-control" id="tMemo" rows="2"></textarea>
+      <textarea class="form-ctrl" id="tMemo" rows="2"></textarea>
     </div>
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <button class="btn btn-outline" style="flex:1" onclick="closeModal('modalTicket')">취소</button>
+    <div class="row gap8 mt12 mb8">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('mTicket')">취소</button>
       <button class="btn btn-primary" style="flex:2" onclick="saveTicket()">저장</button>
     </div>
-    <div id="tDeleteWrap" style="display:none;margin-top:10px;text-align:center;">
-      <button class="btn btn-sm" style="color:var(--danger);background:none;" onclick="deleteTicket()">이용권 삭제</button>
+    <div id="tDelWrap" style="display:none;text-align:center;padding-bottom:4px;">
+      <button onclick="deleteTicket()" style="background:none;border:none;color:var(--red);font-size:13px;cursor:pointer;font-family:inherit;">이용권 삭제</button>
     </div>
   </div>
 </div>
+</div>
 
-<!-- 서비스 관리 모달 -->
-<div class="modal-overlay" id="modalService">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="modalServiceTitle">서비스 추가</div>
-    <div class="form-group">
-      <label class="form-label">서비스명 *</label>
-      <input type="text" class="form-control" id="svName" placeholder="기본 관리">
-    </div>
+<!-- 서비스 모달 -->
+<div class="modal-ov" id="mService">
+<div class="modal">
+  <div class="modal-bar"></div>
+  <div class="modal-hd">
+    <div class="modal-title" id="mServiceTitle">서비스 추가</div>
+    <button class="modal-close" onclick="closeModal('mService')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group"><label class="form-label">서비스명 *</label><input type="text" class="form-ctrl" id="svName"></div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">금액 (원)</label>
-        <input type="number" class="form-control" id="svPrice" placeholder="50000">
-      </div>
-      <div class="form-group">
-        <label class="form-label">소요시간 (분)</label>
-        <input type="number" class="form-control" id="svDuration" placeholder="60">
-      </div>
+      <div class="form-group"><label class="form-label">금액 (원)</label><input type="number" class="form-ctrl" id="svPrice"></div>
+      <div class="form-group"><label class="form-label">소요시간 (분)</label><input type="number" class="form-ctrl" id="svDur"></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">카테고리</label>
-      <input type="text" class="form-control" id="svCategory" placeholder="기본">
-    </div>
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <button class="btn btn-outline" style="flex:1" onclick="closeModal('modalService')">취소</button>
+    <div class="form-group"><label class="form-label">카테고리</label><input type="text" class="form-ctrl" id="svCat"></div>
+    <div class="row gap8 mt12 mb8">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('mService')">취소</button>
       <button class="btn btn-primary" style="flex:2" onclick="saveService()">저장</button>
     </div>
-    <div id="svDeleteWrap" style="display:none;margin-top:10px;text-align:center;">
-      <button class="btn btn-sm" style="color:var(--danger);background:none;" onclick="deleteService()">서비스 삭제</button>
+    <div id="svDelWrap" style="display:none;text-align:center;padding-bottom:4px;">
+      <button onclick="deleteService()" style="background:none;border:none;color:var(--red);font-size:13px;cursor:pointer;font-family:inherit;">서비스 삭제</button>
     </div>
   </div>
 </div>
+</div>
 
-<!-- 이용권 차감 모달 -->
-<div class="modal-overlay" id="modalDeduct">
-  <div class="modal">
-    <div class="modal-handle"></div>
+<!-- 차감 모달 -->
+<div class="modal-ov" id="mDeduct">
+<div class="modal">
+  <div class="modal-bar"></div>
+  <div class="modal-hd">
     <div class="modal-title">이용권 차감</div>
-    <div id="deductTicketInfo" style="background:var(--primary-xlight);border-radius:10px;padding:14px;margin-bottom:16px;font-size:14px;"></div>
-    <div class="form-group">
-      <label class="form-label" id="deductAmountLabel">차감 금액 (원)</label>
-      <input type="number" class="form-control" id="deductAmount" placeholder="0">
-    </div>
-    <div class="form-group">
-      <label class="form-label">서비스명</label>
-      <input type="text" class="form-control" id="deductService" placeholder="">
-    </div>
-    <div class="form-group">
-      <label class="form-label">메모</label>
-      <input type="text" class="form-control" id="deductMemo">
-    </div>
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <button class="btn btn-outline" style="flex:1" onclick="closeModal('modalDeduct')">취소</button>
+    <button class="modal-close" onclick="closeModal('mDeduct')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div id="deductInfo" style="background:var(--g7);border-radius:10px;padding:14px;margin-bottom:16px;font-size:14px;line-height:1.7;"></div>
+    <div class="form-group"><label class="form-label" id="deductLbl">차감 금액 (원)</label><input type="number" class="form-ctrl" id="deductAmt"></div>
+    <div class="form-group"><label class="form-label">서비스명</label><input type="text" class="form-ctrl" id="deductSvc"></div>
+    <div class="form-group"><label class="form-label">메모</label><input type="text" class="form-ctrl" id="deductMemo"></div>
+    <div class="row gap8 mt12 mb8">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('mDeduct')">취소</button>
       <button class="btn btn-primary" style="flex:2" onclick="confirmDeduct()">차감</button>
     </div>
   </div>
 </div>
-
-<!-- 단체 메시지 모달 -->
-<div class="modal-overlay" id="modalBulkMsg">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">단체 메시지</div>
-    <div class="form-group">
-      <label class="form-label">수신 대상</label>
-      <select class="form-control" id="bulkTarget">
-        <option value="all">전체 회원</option>
-        <option value="ticket">이용권 보유 회원</option>
-        <option value="recent">최근 1개월 방문</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">메시지 내용</label>
-      <textarea class="form-control" id="bulkMsg" rows="4" placeholder="안녕하세요 라임스킨입니다..."></textarea>
-    </div>
-    <div id="bulkRecipientCount" style="font-size:13px;color:var(--text-sub);margin-bottom:12px;"></div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-outline" style="flex:1" onclick="closeModal('modalBulkMsg')">취소</button>
-      <button class="btn btn-primary" style="flex:2" onclick="sendBulkMsg()">발송</button>
-    </div>
-  </div>
 </div>
 
 <!-- 설정 모달 -->
-<div class="modal-overlay" id="modalSettings">
-  <div class="modal">
-    <div class="modal-handle"></div>
+<div class="modal-ov" id="mSettings">
+<div class="modal">
+  <div class="modal-bar"></div>
+  <div class="modal-hd">
     <div class="modal-title">업체 설정</div>
-    <div class="form-group">
-      <label class="form-label">상호명</label>
-      <input type="text" class="form-control" id="setShopName" placeholder="라임스킨">
-    </div>
-    <div class="form-group">
-      <label class="form-label">월 매출 목표 (원)</label>
-      <input type="number" class="form-control" id="setMonthlyGoal" placeholder="5000000">
-    </div>
-    <div class="form-group">
-      <label class="form-label">솔라피 API KEY</label>
-      <input type="text" class="form-control" id="setApiKey">
-    </div>
-    <div class="form-group">
-      <label class="form-label">솔라피 API SECRET</label>
-      <input type="text" class="form-control" id="setApiSecret">
-    </div>
-    <div class="form-group">
-      <label class="form-label">발신번호</label>
-      <input type="tel" class="form-control" id="setSenderPhone">
-    </div>
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <button class="btn btn-outline" style="flex:1" onclick="closeModal('modalSettings')">취소</button>
+    <button class="modal-close" onclick="closeModal('mSettings')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group"><label class="form-label">상호명</label><input type="text" class="form-ctrl" id="setShop"></div>
+    <div class="form-group"><label class="form-label">월 매출 목표 (원)</label><input type="number" class="form-ctrl" id="setGoal"></div>
+    <div class="form-group"><label class="form-label">솔라피 API KEY</label><input type="text" class="form-ctrl" id="setKey"></div>
+    <div class="form-group"><label class="form-label">솔라피 API SECRET</label><input type="text" class="form-ctrl" id="setSec"></div>
+    <div class="form-group"><label class="form-label">발신번호</label><input type="tel" class="form-ctrl" id="setPhone"></div>
+    <div class="row gap8 mt12 mb8">
+      <button class="btn btn-outline" style="flex:1" onclick="closeModal('mSettings')">취소</button>
       <button class="btn btn-primary" style="flex:2" onclick="saveSettings()">저장</button>
     </div>
   </div>
 </div>
-
-<!-- 슬라이드 패널들 -->
-<!-- 회원 상세 패널 -->
-<div class="panel-overlay" id="memberPanelOverlay" onclick="closePanel('memberPanel')"></div>
-<div class="slide-panel" id="memberPanel">
-  <div class="panel-header">
-    <button class="btn btn-outline btn-sm btn-icon" onclick="closePanel('memberPanel')">✕</button>
-    <h2 id="memberPanelName">회원 상세</h2>
-    <button class="btn btn-primary btn-sm" onclick="editCurrentMember()">수정</button>
-  </div>
-  <div class="inner-tabs">
-    <div class="inner-tab active" onclick="switchMemberTab('info')">기본정보</div>
-    <div class="inner-tab" onclick="switchMemberTab('bookings')">예약이력</div>
-    <div class="inner-tab" onclick="switchMemberTab('tickets')">이용권</div>
-  </div>
-  <div id="memberPanelBody"></div>
 </div>
 
-<!-- 이용권 상세 패널 -->
-<div class="panel-overlay" id="ticketPanelOverlay" onclick="closePanel('ticketPanel')"></div>
-<div class="slide-panel" id="ticketPanel">
-  <div class="panel-header">
-    <button class="btn btn-outline btn-sm btn-icon" onclick="closePanel('ticketPanel')">✕</button>
-    <h2 id="ticketPanelTitle">이용권 상세</h2>
-    <button class="btn btn-primary btn-sm" onclick="editCurrentTicket()">수정</button>
+<!-- ═══════════ PANELS ═══════════ -->
+
+<!-- 회원 패널 -->
+<div class="panel-ov" id="ovMember" onclick="closePanel('pMember')"></div>
+<div class="panel" id="pMember">
+  <div class="panel-hd">
+    <button class="panel-back" onclick="closePanel('pMember')">←</button>
+    <h2 id="pMemberName">회원 상세</h2>
+    <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:#fff;border:none;" onclick="editCurMember()">수정</button>
   </div>
-  <div id="ticketPanelBody"></div>
+  <div class="inner-tabs" id="pMemberTabs">
+    <div class="inner-tab on" onclick="switchMTab('info')">기본정보</div>
+    <div class="inner-tab" onclick="switchMTab('bookings')">예약이력</div>
+    <div class="inner-tab" onclick="switchMTab('tickets')">이용권</div>
+  </div>
+  <div id="pMemberBody" style="flex:1;overflow-y:auto;"></div>
+</div>
+
+<!-- 이용권 패널 -->
+<div class="panel-ov" id="ovTicket" onclick="closePanel('pTicket')"></div>
+<div class="panel" id="pTicket">
+  <div class="panel-hd">
+    <button class="panel-back" onclick="closePanel('pTicket')">←</button>
+    <h2 id="pTicketTitle">이용권 상세</h2>
+    <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:#fff;border:none;" onclick="editCurTicket()">수정</button>
+  </div>
+  <div id="pTicketBody" style="flex:1;overflow-y:auto;padding:14px;"></div>
 </div>
 
 <!-- 통계 패널 -->
-<div class="panel-overlay" id="statsPanelOverlay" onclick="closePanel('statsPanel')"></div>
-<div class="slide-panel" id="statsPanel">
-  <div class="panel-header">
-    <button class="btn btn-outline btn-sm btn-icon" onclick="closePanel('statsPanel')">✕</button>
+<div class="panel-ov" id="ovStats" onclick="closePanel('stats')"></div>
+<div class="panel" id="stats">
+  <div class="panel-hd">
+    <button class="panel-back" onclick="closePanel('stats')">←</button>
     <h2>매출 통계</h2>
   </div>
-  <div id="statsPanelBody"></div>
+  <div id="statsBody" style="flex:1;overflow-y:auto;"></div>
 </div>
 
-<!-- 서비스 관리 패널 -->
-<div class="panel-overlay" id="servicePanelOverlay" onclick="closePanel('servicePanel')"></div>
-<div class="slide-panel" id="servicePanel">
-  <div class="panel-header">
-    <button class="btn btn-outline btn-sm btn-icon" onclick="closePanel('servicePanel')">✕</button>
+<!-- 서비스 패널 -->
+<div class="panel-ov" id="ovService" onclick="closePanel('pService')"></div>
+<div class="panel" id="pService">
+  <div class="panel-hd">
+    <button class="panel-back" onclick="closePanel('pService')">←</button>
     <h2>서비스 관리</h2>
-    <button class="btn btn-primary btn-sm" onclick="openAddService()">+ 추가</button>
+    <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:#fff;border:none;" onclick="openServiceModal()">+ 추가</button>
   </div>
-  <div id="servicePanelBody"></div>
-</div>
-
-<!-- 데이터 관리 패널 -->
-<div class="panel-overlay" id="dataPanelOverlay" onclick="closePanel('dataPanel')"></div>
-<div class="slide-panel" id="dataPanel">
-  <div class="panel-header">
-    <button class="btn btn-outline btn-sm btn-icon" onclick="closePanel('dataPanel')">✕</button>
-    <h2>데이터 관리</h2>
-  </div>
-  <div class="panel-body">
-    <div class="card mb-8" style="margin-bottom:12px;">
-      <div style="font-weight:700;margin-bottom:10px;">📤 JSON 내보내기</div>
-      <p style="font-size:13px;color:var(--text-sub);margin-bottom:12px;">전체 데이터를 JSON 파일로 저장합니다.</p>
-      <button class="btn btn-primary" onclick="exportJSON()">JSON 다운로드</button>
-    </div>
-    <div class="card mb-8" style="margin-bottom:12px;">
-      <div style="font-weight:700;margin-bottom:10px;">📥 JSON 복원</div>
-      <p style="font-size:13px;color:var(--text-sub);margin-bottom:12px;">저장된 JSON 파일로 데이터를 복원합니다.</p>
-      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-      <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">파일 선택 및 복원</button>
-    </div>
-    <div class="card">
-      <div style="font-weight:700;margin-bottom:10px;color:var(--danger);">⚠️ 데이터 초기화</div>
-      <p style="font-size:13px;color:var(--text-sub);margin-bottom:12px;">모든 데이터를 삭제합니다. 되돌릴 수 없습니다.</p>
-      <button class="btn btn-danger" onclick="resetAllData()">전체 초기화</button>
-    </div>
-  </div>
+  <div id="pServiceBody" style="flex:1;overflow-y:auto;"></div>
 </div>
 
 <!-- 미수금 패널 -->
-<div class="panel-overlay" id="unpaidPanelOverlay" onclick="closePanel('unpaidPanel')"></div>
-<div class="slide-panel" id="unpaidPanel">
-  <div class="panel-header">
-    <button class="btn btn-outline btn-sm btn-icon" onclick="closePanel('unpaidPanel')">✕</button>
+<div class="panel-ov" id="ovUnpaid" onclick="closePanel('pUnpaid')"></div>
+<div class="panel" id="pUnpaid">
+  <div class="panel-hd">
+    <button class="panel-back" onclick="closePanel('pUnpaid')">←</button>
     <h2>미수금 관리</h2>
   </div>
-  <div id="unpaidPanelBody"></div>
+  <div id="pUnpaidBody" style="flex:1;overflow-y:auto;"></div>
 </div>
 
-<!-- 마감 요약 패널 -->
-<div class="panel-overlay" id="closingPanelOverlay" onclick="closePanel('closingPanel')"></div>
-<div class="slide-panel" id="closingPanel">
-  <div class="panel-header">
-    <button class="btn btn-outline btn-sm btn-icon" onclick="closePanel('closingPanel')">✕</button>
+<!-- 마감 패널 -->
+<div class="panel-ov" id="ovClosing" onclick="closePanel('pClosing')"></div>
+<div class="panel" id="pClosing">
+  <div class="panel-hd">
+    <button class="panel-back" onclick="closePanel('pClosing')">←</button>
     <h2>하루 마감 요약</h2>
   </div>
-  <div id="closingPanelBody"></div>
+  <div id="pClosingBody" style="flex:1;overflow-y:auto;padding:14px;"></div>
 </div>
 
+<!-- 데이터 관리 패널 -->
+<div class="panel-ov" id="ovData" onclick="closePanel('pData')"></div>
+<div class="panel" id="pData">
+  <div class="panel-hd">
+    <button class="panel-back" onclick="closePanel('pData')">←</button>
+    <h2>데이터 관리</h2>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:14px;">
+    <div class="card mb12" style="margin-bottom:12px;padding:18px;">
+      <div class="fw7 mb8" style="margin-bottom:8px;">📤 JSON 내보내기</div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:12px;">전체 데이터를 JSON 파일로 저장합니다.</p>
+      <button class="btn btn-primary btn-sm" onclick="exportJSON()">JSON 다운로드</button>
+    </div>
+    <div class="card mb12" style="margin-bottom:12px;padding:18px;">
+      <div class="fw7 mb8" style="margin-bottom:8px;">📥 JSON 복원</div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:12px;">저장된 JSON 파일로 데이터를 복원합니다.</p>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('importFile').click()">파일 선택 및 복원</button>
+    </div>
+    <div class="card" style="padding:18px;border:1.5px solid #fdecea;">
+      <div class="fw7 mb8" style="margin-bottom:8px;color:var(--red);">⚠️ 전체 초기화</div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:12px;">모든 데이터를 삭제합니다. 되돌릴 수 없습니다.</p>
+      <button class="btn btn-danger btn-sm" onclick="resetData()">전체 초기화</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCRIPT ═══════════ -->
 <script>
-// =============================================
-// DATA STORE
-// =============================================
-let appData = {
-  members: [],
-  bookings: [],
-  tickets: [],
-  ticketHistory: [],
-  services: [],
-  settings: {
-    shopName: '라임스킨',
-    phone: '',
-    monthlyGoal: 5000000,
-    apiKey: 'NCSN84FMPLK0ZRJV',
-    apiSecret: 'I7TAN3PP8A0JOCPYFFM5B4XEN0SHNTYL',
-    senderKey: 'KA01PF260303011802344MukuvkKjzXI',
-    senderPhone: '01032057451',
-    notifiedTickets: []
+// ── TEMPLATES ──
+const TPL = {
+  CONFIRM: 'KA01TP260303085248678ef4l9FvKT92',
+  CANCEL:  'KA01TP260303085406608JlVxRzvGT24',
+  DEDUCT:  'KA01TP260303085526915X7VfYFYZD6s',
+  LOW:     'KA01TP260303085621327gXfCYSrmKBF',
+  EXPIRE:  'KA01TP26030308570608289qGVOhqmrP',
+  REMIND:  'KA01TP260303085208365I0uoVbWPhTo'
+};
+
+// ── DATA ──
+let D = {
+  members:[], bookings:[], tickets:[], ticketHistory:[], services:[],
+  settings:{
+    shopName:'라임스킨', phone:'01032057451', monthlyGoal:5000000,
+    apiKey:'NCSN84FMPLK0ZRJV', apiSecret:'I7TAN3PP8A0JOCPYFFM5B4XEN0SHNTYL',
+    senderKey:'KA01PF260303011802344MukuvkKjzXI', senderPhone:'01032057451',
+    notifiedTickets:[]
   }
 };
 
-// Template IDs
-const TPL = {
-  CONFIRM:  'KA01TP260303085248678ef4l9FvKT92',
-  CANCEL:   'KA01TP260303085406608JlVxRzvGT24',
-  DEDUCT:   'KA01TP260303085526915X7VfYFYZD6s',
-  LOW:      'KA01TP260303085621327gXfCYSrmKBF',
-  EXPIRE:   'KA01TP26030308570608289qGVOhqmrP',
-  REMIND:   'KA01TP260303085208365I0uoVbWPhTo'
-};
+// ── STATE ──
+let curTab='home', calY, calM, calSel;
+let editBid=null, editMid=null, editTid=null, editSvid=null;
+let curMid=null, curTid=null, curMTab='info';
+let selMemberId=null, deductTid=null;
 
-// State
-let currentTab = 'home';
-let calYear, calMonth, calSelectedDate;
-let editingBookingId = null;
-let editingMemberId = null;
-let editingTicketId = null;
-let editingServiceId = null;
-let currentMemberId = null;
-let currentTicketId = null;
-let currentMemberTab = 'info';
-let deductTicketId = null;
-let selectedMemberId = null;
-let selectedServiceName = '';
-
-// =============================================
-// INIT
-// =============================================
+// ── INIT ──
 async function init() {
   const now = new Date();
-  calYear = now.getFullYear();
-  calMonth = now.getMonth();
-  calSelectedDate = toDateStr(now);
-
+  calY = now.getFullYear(); calM = now.getMonth();
+  calSel = toDS(now);
   await loadData();
-  hideLoading();
+  document.getElementById('loading').style.display='none';
   renderAll();
-  setupNotifications();
-  checkTicketExpiry();
+  setupSW();
+  checkExpiry();
 }
 
-function hideLoading() {
-  document.getElementById('loading').style.display = 'none';
-}
-
-function renderAll() {
-  renderHome();
-  renderCalendar();
-  renderMembers();
-  renderTickets();
-  renderMoreMenu();
-  updateHeaderShopName();
-}
-
-// =============================================
-// REDIS / LOCAL DATA
-// =============================================
+// ── REDIS ──
 async function loadData() {
   try {
-    const res = await fetch('/api/data');
-    if (res.ok) {
-      const json = await res.json();
-      if (json.data && json.data.members && json.data.members.length > 0) {
-        appData = { ...appData, ...json.data };
-        localStorage.setItem('limeskin_backup', JSON.stringify(appData));
-        return;
+    const r = await fetch('/api/data');
+    if (r.ok) {
+      const j = await r.json();
+      if (j.data && j.data.members && j.data.members.length > 0) {
+        D = {...D, ...j.data};
+        ls('set', D); return;
       }
     }
-  } catch(e) {}
-  // fallback to localStorage
-  const local = localStorage.getItem('limeskin_backup');
-  if (local) {
-    try { appData = { ...appData, ...JSON.parse(local) }; } catch(e) {}
-  }
+  } catch(e){}
+  const b = ls('get');
+  if (b) D = {...D, ...b};
 }
 
 async function saveData() {
+  const payload = {...D, updatedAt: new Date().toISOString()};
+  ls('set', payload);
   try {
-    const payload = { ...appData, updatedAt: new Date().toISOString() };
-    localStorage.setItem('limeskin_backup', JSON.stringify(payload));
-    const res = await fetch('/api/data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error('Redis save failed');
-  } catch(e) {
-    // localStorage already saved
-    console.warn('Redis save failed, using localStorage backup');
-  }
+    await fetch('/api/data', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+  } catch(e){}
 }
 
-// =============================================
-// ALIMTALK
-// =============================================
-async function sendAlimtalk(phone, templateId, variables) {
+function ls(op, val) {
+  try {
+    if (op==='set') localStorage.setItem('ls_bk', JSON.stringify(val));
+    if (op==='get') { const v=localStorage.getItem('ls_bk'); return v?JSON.parse(v):null; }
+  } catch(e){ return null; }
+}
+
+// ── ALIMTALK ──
+async function alim(phone, tplId, vars) {
   if (!phone) return;
   try {
-    await fetch('/api/alimtalk', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: phone.replace(/-/g,''), templateId, variables })
+    await fetch('/api/alimtalk', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({to: phone.replace(/-/g,''), templateId: tplId, variables: vars})
     });
-  } catch(e) { console.warn('alimtalk error', e); }
+  } catch(e){}
 }
 
-// =============================================
-// TAB NAVIGATION
-// =============================================
-function showTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + (tab === 'stats' ? 'more' : tab) ).classList.add('active');
-  const tabEl = document.querySelector(`[data-tab="${tab}"]`);
-  if (tabEl) tabEl.classList.add('active');
-
-  const titles = { home:'라임스킨', booking:'예약', member:'회원', ticket:'이용권', more:'더보기' };
-  document.getElementById('headerTitle').textContent = titles[tab] || '라임스킨';
-  document.getElementById('headerSub').textContent = '';
-  document.getElementById('headerRightBtn').style.display = 'none';
-
-  if (tab === 'stats') { openPanel('statsPanel'); renderStats(); return; }
-  if (tab === 'booking') { renderCalendar(); renderSelectedDay(); }
-  if (tab === 'member') renderMembers();
-  if (tab === 'ticket') renderTickets();
-}
-
-function headerRightAction() {
-  if (currentTab === 'member') openAddMember();
-  else if (currentTab === 'ticket') openAddTicket();
-  else if (currentTab === 'booking') openAddBooking();
-}
-
-// =============================================
-// UTILS
-// =============================================
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-function toDateStr(d) { return d.toFullYear ? d.toFullYear() : d.toISOString().slice(0,10); }
-function todayStr() { return new Date().toISOString().slice(0,10); }
-function fmtWon(n) { return '₩' + Number(n||0).toLocaleString(); }
-function fmtDate(s) {
+// ── UTILS ──
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function toDS(d) { return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; }
+function p2(n) { return String(n).padStart(2,'0'); }
+function today() { return new Date().toISOString().slice(0,10); }
+function won(n) { return '₩'+Number(n||0).toLocaleString(); }
+function fdate(s) {
   if (!s) return '';
-  const d = new Date(s);
+  const d=new Date(s);
   return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
 }
-function fmtPhone(p) {
+function fphone(p) {
   if (!p) return '';
-  const d = p.replace(/\D/g,'');
-  if (d.length === 11) return d.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3');
-  if (d.length === 10) return d.replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3');
+  const d=p.replace(/\D/g,'');
+  if (d.length===11) return d.replace(/(\d{3})(\d{4})(\d{4})/,'$1-$2-$3');
+  if (d.length===10) return d.replace(/(\d{3})(\d{3})(\d{4})/,'$1-$2-$3');
   return p;
 }
-function daysUntil(dateStr) {
-  if (!dateStr) return Infinity;
-  const diff = new Date(dateStr) - new Date(todayStr());
-  return Math.ceil(diff / 86400000);
+function daysLeft(s) {
+  if (!s) return Infinity;
+  return Math.ceil((new Date(s)-new Date(today()))/86400000);
 }
-function isRevenue(b) {
-  return b.status === 'done' && b.payMethod !== 'unpaid' && b.type !== 'ticketUse';
-}
-function avatarLetter(name) { return name ? name.slice(0,1) : '?'; }
-function showToast(msg, isError=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show' + (isError ? ' error' : '');
-  setTimeout(()=>{ t.className = ''; }, 2500);
+function isRev(b) { return b.status==='done' && b.payMethod!=='unpaid' && b.type!=='ticketUse'; }
+function av(name) { return name?name.slice(0,1):'?'; }
+function stLbl(s) { return {pending:'대기',confirmed:'확정',done:'완료',cancelled:'취소'}[s]||s; }
+function stCls(s) { return {pending:'s-pending',confirmed:'s-confirmed',done:'s-done',cancelled:'s-cancelled'}[s]||''; }
+
+function toast(msg, err=false) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show'+(err?' err':'');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='',2500);
 }
 
-// =============================================
-// HOME
-// =============================================
+// ── TABS ──
+function goTab(tab) {
+  curTab=tab;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pg-'+tab).classList.add('active','page-enter');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('on');
+
+  const titles={home:'라임스킨',booking:'예약',member:'회원',ticket:'이용권',more:'더보기'};
+  document.getElementById('hdTitle').textContent = titles[tab]||'';
+  document.getElementById('hdBack').classList.remove('show');
+  document.getElementById('hdAction').classList.remove('show');
+
+  if (tab==='booking') { renderCal(); renderSelDay(); }
+  if (tab==='member') renderMembers();
+  if (tab==='ticket') renderTickets();
+}
+
+function goBack() { goTab('home'); }
+
+// ── HEADER ACTION ──
+let hdFn = null;
+function hdActionFn() { if (hdFn) hdFn(); }
+function setHdAction(label, fn) {
+  document.getElementById('hdAction').textContent=label;
+  document.getElementById('hdAction').classList.add('show');
+  hdFn = fn;
+}
+
+// ── RENDER ALL ──
+function renderAll() {
+  renderHome(); renderCal(); renderSelDay();
+  renderMembers(); renderTickets(); renderMoreMenu();
+  document.getElementById('hbShop').textContent = D.settings.shopName||'라임스킨';
+}
+
+// ── HOME ──
 function renderHome() {
-  const now = new Date();
-  const days = ['일','월','화','수','목','금','토'];
-  document.getElementById('heroDate').textContent =
+  const now=new Date();
+  const days=['일','월','화','수','목','금','토'];
+  document.getElementById('hbDate').textContent =
     `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 (${days[now.getDay()]})`;
-  document.getElementById('heroShopName').textContent = appData.settings.shopName || '라임스킨';
+  document.getElementById('hbShop').textContent = D.settings.shopName||'라임스킨';
 
-  // 이번달 매출
-  const ym = todayStr().slice(0,7);
-  const sales = appData.bookings.filter(b => b.date && b.date.startsWith(ym) && isRevenue(b))
-    .reduce((s,b) => s + (b.price||0), 0);
-  const goal = appData.settings.monthlyGoal || 5000000;
-  const pct = Math.min(100, Math.round(sales/goal*100));
-  document.getElementById('heroSales').textContent = fmtWon(sales);
-  document.getElementById('heroGoalFill').style.width = pct + '%';
-  document.getElementById('heroGoalText').textContent = `목표 ${fmtWon(goal)} · ${pct}% 달성`;
+  const ym=today().slice(0,7);
+  const sales=D.bookings.filter(b=>b.date?.startsWith(ym)&&isRev(b)).reduce((s,b)=>s+(b.price||0),0);
+  const goal=D.settings.monthlyGoal||5000000;
+  const pct=Math.min(100,Math.round(sales/goal*100));
+  document.getElementById('hbAmt').textContent=won(sales);
+  document.getElementById('hbGoal').style.width=pct+'%';
+  document.getElementById('hbGoalTxt').textContent=`목표 ${won(goal)} · ${pct}% 달성`;
 
-  // 오늘 예약
-  const today = todayStr();
-  const todayBs = appData.bookings.filter(b=>b.date===today && b.status!=='cancelled')
-    .sort((a,b)=>a.time.localeCompare(b.time));
-  const container = document.getElementById('todayBookings');
-  if (!todayBs.length) {
-    container.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>오늘 예약이 없습니다</p></div>';
+  const td=today();
+  const tbs=D.bookings.filter(b=>b.date===td&&b.status!=='cancelled').sort((a,b)=>a.time?.localeCompare(b.time||''));
+  const el=document.getElementById('todayList');
+  if (!tbs.length) {
+    el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><p>오늘 예약이 없습니다</p></div>';
   } else {
-    container.innerHTML = todayBs.map(b => `
-      <div class="today-booking-item" onclick="openEditBooking('${b.id}')">
-        <div class="booking-time">${b.time||''}</div>
-        <div class="booking-info">
-          <div class="bname">${b.name||''} <span class="badge badge-${b.status==='done'?'blue':b.status==='confirmed'?'green':'orange'}" style="font-size:10px">${statusLabel(b.status)}</span></div>
-          <div class="bsub">${b.service||''} ${b.price?'· '+fmtWon(b.price):''}</div>
+    el.innerHTML=tbs.map(b=>`
+      <div class="li" onclick="openEditBooking('${b.id}')">
+        <div style="width:44px;text-align:center;flex-shrink:0;">
+          <div style="font-size:13px;font-weight:900;color:var(--g2)">${b.time||'--'}</div>
         </div>
+        <div class="li-info">
+          <div class="li-name">${b.name||''}</div>
+          <div class="li-sub">${b.service||''} ${b.price?'· '+won(b.price):''}</div>
+        </div>
+        <span class="badge ${stCls(b.status)}">${stLbl(b.status)}</span>
       </div>`).join('');
   }
 
-  // 이용권 요약
-  const active = appData.tickets.filter(t => t.remaining > 0 && (!t.expireDate || daysUntil(t.expireDate) >= 0));
-  const htEl = document.getElementById('homeTickets');
+  const active=D.tickets.filter(t=>t.remaining>0&&(!t.expireDate||daysLeft(t.expireDate)>=0));
+  const ht=document.getElementById('homeTickets');
   if (!active.length) {
-    htEl.innerHTML = '<div class="empty-state"><div class="icon">🎫</div><p>활성 이용권이 없습니다</p></div>';
+    ht.innerHTML='<div class="empty"><div class="empty-icon">🎫</div><p>활성 이용권이 없습니다</p></div>';
   } else {
-    htEl.innerHTML = active.slice(0,4).map(t => {
-      const pct = t.total > 0 ? Math.min(100, Math.round(t.remaining/t.total*100)) : 0;
-      const cls = pct < 20 ? 'critical' : pct < 40 ? 'low' : '';
-      return `<div class="ticket-card" onclick="openTicketPanel('${t.id}')">
-        <div class="tc-header">
-          <div><div class="tc-name">${t.name||'이용권'}</div><div class="tc-member">${t.memberName||''}</div></div>
-          <div class="badge ${pct<20?'badge-red':pct<40?'badge-orange':'badge-green'}">${pct}%</div>
-        </div>
-        <div class="ticket-bar"><div class="ticket-fill ${cls}" style="width:${pct}%"></div></div>
-        <div class="ticket-stats"><span>잔여 <strong>${t.type==='count'?t.remaining+'회':fmtWon(t.remaining)}</strong></span>
-          <span>${t.expireDate?'만료 '+fmtDate(t.expireDate):''}</span></div>
-      </div>`;
-    }).join('');
+    ht.innerHTML=active.slice(0,4).map(t=>tkCardHTML(t)).join('');
   }
 }
 
-function updateHeaderShopName() {
-  document.getElementById('heroShopName').textContent = appData.settings.shopName || '라임스킨';
+function tkCardHTML(t) {
+  const pct=t.total>0?Math.min(100,Math.round(t.remaining/t.total*100)):0;
+  const cls=pct<20?'tk-fill-lo':pct<50?'tk-fill-md':'tk-fill-hi';
+  return `<div class="tk-card" onclick="openTicketPanel('${t.id}')">
+    <div class="tk-head">
+      <div><div class="tk-name">${t.name||'이용권'}</div><div class="tk-member">👤 ${t.memberName||''}</div></div>
+      <span class="badge ${pct<20?'b-red':pct<50?'b-orange':'b-green'}">${pct}%</span>
+    </div>
+    <div class="tk-bar"><div class="tk-fill ${cls}" style="width:${pct}%"></div></div>
+    <div class="tk-stats">
+      <span>잔여 <strong>${t.type==='count'?t.remaining+'회':won(t.remaining)}</strong></span>
+      <span>${t.expireDate?fdate(t.expireDate):''}</span>
+    </div>
+  </div>`;
 }
 
-function statusLabel(s) {
-  return {pending:'대기',confirmed:'확정',done:'완료',cancelled:'취소'}[s]||s;
-}
+// ── CALENDAR ──
+function renderCal() {
+  document.getElementById('calTitle').textContent=`${calY}년 ${calM+1}월`;
+  const days=['일','월','화','수','목','금','토'];
+  document.getElementById('calHead').innerHTML=days.map(d=>`<div class="cal-dh">${d}</div>`).join('');
 
-// =============================================
-// CALENDAR
-// =============================================
-function renderCalendar() {
-  const title = document.getElementById('calMonthTitle');
-  title.textContent = `${calYear}년 ${calMonth+1}월`;
+  const first=new Date(calY,calM,1), last=new Date(calY,calM+1,0);
+  const td=today();
+  const bmap={};
+  D.bookings.filter(b=>b.status!=='cancelled').forEach(b=>{ bmap[b.date]=(bmap[b.date]||0)+1; });
 
-  const headers = document.getElementById('calDayHeaders');
-  const days = ['일','월','화','수','목','금','토'];
-  headers.innerHTML = days.map(d=>`<div class="cal-day-header">${d}</div>`).join('');
-
-  const first = new Date(calYear, calMonth, 1);
-  const last = new Date(calYear, calMonth+1, 0);
-  const today = todayStr();
-
-  let cells = [];
-  for (let i=0; i<first.getDay(); i++) {
-    const d = new Date(calYear, calMonth, -first.getDay()+i+1);
-    cells.push({date:toDateStr2(d), other:true});
+  let cells=[];
+  for (let i=0;i<first.getDay();i++) {
+    const d=new Date(calY,calM,-first.getDay()+i+1);
+    cells.push({ds:toDS(d),other:true});
   }
-  for (let d=1; d<=last.getDate(); d++) {
-    cells.push({date:`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`, other:false});
-  }
-  while(cells.length%7!==0) {
-    const last2 = cells[cells.length-1];
-    const nd = new Date(last2.date); nd.setDate(nd.getDate()+1);
-    cells.push({date:toDateStr2(nd), other:true});
+  for (let d=1;d<=last.getDate();d++) cells.push({ds:`${calY}-${p2(calM+1)}-${p2(d)}`,other:false});
+  while (cells.length%7!==0) {
+    const nd=new Date(cells[cells.length-1].ds); nd.setDate(nd.getDate()+1);
+    cells.push({ds:toDS(nd),other:true});
   }
 
-  const bCounts = {};
-  appData.bookings.filter(b=>b.status!=='cancelled').forEach(b=>{ bCounts[b.date] = (bCounts[b.date]||0)+1; });
-
-  document.getElementById('calGrid').innerHTML = cells.map(c => {
-    const day = new Date(c.date).getDate();
-    const isToday = c.date === today;
-    const isSel = c.date === calSelectedDate;
-    const cnt = bCounts[c.date] || 0;
-    return `<div class="cal-day ${isToday?'today':''} ${isSel?'selected':''} ${c.other?'other-month':''}"
-      onclick="selectCalDay('${c.date}')">
-      <div class="d">${day}</div>
-      ${cnt?`<div class="dot">${cnt}건</div>`:''}
+  document.getElementById('calGrid').innerHTML=cells.map(c=>{
+    const day=new Date(c.ds).getDate();
+    const cnt=bmap[c.ds]||0;
+    const isToday=c.ds===td, isSel=c.ds===calSel;
+    return `<div class="cal-cell ${isToday?'today':''} ${isSel?'selected':''} ${c.other?'other':''}" onclick="selDay('${c.ds}')">
+      <div class="dn">${day}</div>
+      <div class="cal-dots">${cnt?`<div class="cal-dot"></div>`:''}</div>
     </div>`;
   }).join('');
 }
 
-function toDateStr2(d) {
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
+function chMonth(d) { calM+=d; if(calM<0){calM=11;calY--;}if(calM>11){calM=0;calY++;} renderCal(); }
 
-function changeMonth(dir) {
-  calMonth += dir;
-  if (calMonth < 0) { calMonth = 11; calYear--; }
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  renderCalendar();
-}
+function selDay(ds) { calSel=ds; renderCal(); renderSelDay(); }
 
-function selectCalDay(date) {
-  calSelectedDate = date;
-  renderCalendar();
-  renderSelectedDay();
-}
-
-function renderSelectedDay() {
-  const label = document.getElementById('selectedDayLabel');
-  if (!calSelectedDate) { label.textContent = '날짜를 선택하세요'; return; }
-  const d = new Date(calSelectedDate);
-  label.textContent = `${d.getMonth()+1}월 ${d.getDate()}일 예약`;
-
-  const bs = appData.bookings.filter(b=>b.date===calSelectedDate && b.status!=='cancelled')
-    .sort((a,b)=>a.time.localeCompare(b.time));
-  const list = document.getElementById('selectedDayList');
+function renderSelDay() {
+  if (!calSel) return;
+  const d=new Date(calSel);
+  document.getElementById('selDayLabel').textContent=`${d.getMonth()+1}월 ${d.getDate()}일`;
+  const bs=D.bookings.filter(b=>b.date===calSel&&b.status!=='cancelled').sort((a,b)=>a.time?.localeCompare(b.time||''));
+  const el=document.getElementById('selDayList');
   if (!bs.length) {
-    list.innerHTML = '<div class="empty-state"><p>예약이 없습니다</p></div>';
-  } else {
-    list.innerHTML = bs.map(b=>`
-      <div class="today-booking-item" onclick="openEditBooking('${b.id}')">
-        <div class="booking-time">${b.time||''}</div>
-        <div class="booking-info">
-          <div class="bname">${b.name||''} <span class="badge badge-${b.status==='done'?'blue':b.status==='confirmed'?'green':'orange'}" style="font-size:10px">${statusLabel(b.status)}</span></div>
-          <div class="bsub">${b.service||''} ${b.price?'· '+fmtWon(b.price):''} ${b.payMethod==='unpaid'?'<span class="badge badge-red" style="font-size:10px">미수금</span>':''}</div>
-        </div>
-        <div class="right" style="font-size:12px;color:var(--text-sub)">${b.time||''}</div>
-      </div>`).join('');
+    el.innerHTML='<div class="empty"><p>예약이 없습니다</p></div>'; return;
   }
+  el.innerHTML=`<div class="card" style="margin:0 14px 14px;">${bs.map(b=>`
+    <div class="li" onclick="openEditBooking('${b.id}')">
+      <div style="width:44px;text-align:center;flex-shrink:0;">
+        <div style="font-size:13px;font-weight:900;color:var(--g2)">${b.time||'--'}</div>
+      </div>
+      <div class="li-info">
+        <div class="li-name">${b.name||''}</div>
+        <div class="li-sub">${b.service||''} ${b.price?'· '+won(b.price):''}</div>
+      </div>
+      <span class="badge ${stCls(b.status)}">${stLbl(b.status)}</span>
+    </div>`).join('')}</div>`;
 }
 
-// =============================================
-// MEMBERS
-// =============================================
+// ── MEMBERS ──
 function renderMembers() {
-  const q = (document.getElementById('memberSearch').value||'').toLowerCase();
-  let list = appData.members.filter(m =>
-    !q || m.name.toLowerCase().includes(q) || (m.phone||'').includes(q)
-  ).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
-
-  const el = document.getElementById('memberList');
+  const q=(document.getElementById('memberQ').value||'').toLowerCase();
+  const list=D.members.filter(m=>!q||m.name.toLowerCase().includes(q)||(m.phone||'').includes(q))
+    .sort((a,b)=>a.name.localeCompare(b.name,'ko'));
+  const el=document.getElementById('memberList');
   if (!list.length) {
-    el.innerHTML = '<div class="empty-state"><div class="icon">👥</div><p>회원이 없습니다</p></div>';
-    return;
+    el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><p>회원이 없습니다</p></div>'; return;
   }
-  el.innerHTML = list.map(m => {
-    const lastVisit = m.lastVisit ? fmtDate(m.lastVisit) : '방문 없음';
-    const ticket = appData.tickets.find(t=>t.memberId===m.id && t.remaining>0);
-    return `<div class="list-item" onclick="openMemberPanel('${m.id}')">
-      <div class="avatar">${avatarLetter(m.name)}</div>
-      <div class="info">
-        <div class="name">${m.name} ${m.gender?`<span style="font-size:11px;color:var(--text-muted)">${m.gender}</span>`:''}</div>
-        <div class="sub">${fmtPhone(m.phone)} · 최근: ${lastVisit}</div>
+  el.innerHTML=`<div class="card" style="margin:12px 14px;">${list.map(m=>{
+    const tk=D.tickets.find(t=>t.memberId===m.id&&t.remaining>0);
+    return `<div class="li" onclick="openMemberPanel('${m.id}')">
+      <div class="li-av">${av(m.name)}</div>
+      <div class="li-info">
+        <div class="li-name">${m.name} ${m.gender?`<span style="font-size:11px;color:var(--text3)">${m.gender}</span>`:''}</div>
+        <div class="li-sub">${fphone(m.phone)} ${m.lastVisit?'· '+fdate(m.lastVisit):''}</div>
       </div>
-      <div class="right">
-        ${ticket?`<div class="badge badge-green" style="font-size:11px">이용권</div>`:''}
-      </div>
+      <div class="li-right">${tk?'<span class="badge b-green">이용권</span>':''}</div>
     </div>`;
-  }).join('');
+  }).join('')}</div>`;
 }
 
-// =============================================
-// MEMBER PANEL
-// =============================================
-function openMemberPanel(id) {
-  currentMemberId = id;
-  currentMemberTab = 'info';
-  const m = appData.members.find(x=>x.id===id);
-  if (!m) return;
-  document.getElementById('memberPanelName').textContent = m.name;
-  document.getElementById('memberPanelOverlay').classList.add('open');
-  document.getElementById('memberPanel').classList.add('open');
-  renderMemberPanelTab();
-}
-
-function closePanel(id) {
-  document.getElementById(id+'Overlay').classList.remove('open');
-  document.getElementById(id).classList.remove('open');
-}
-function openPanel(id) {
-  document.getElementById(id+'Overlay').classList.add('open');
-  document.getElementById(id).classList.add('open');
-}
-
-function switchMemberTab(tab) {
-  currentMemberTab = tab;
-  document.querySelectorAll('#memberPanel .inner-tab').forEach((t,i)=>{
-    t.classList.toggle('active', ['info','bookings','tickets'][i]===tab);
-  });
-  renderMemberPanelTab();
-}
-
-function renderMemberPanelTab() {
-  const m = appData.members.find(x=>x.id===currentMemberId);
-  if (!m) return;
-  const body = document.getElementById('memberPanelBody');
-
-  if (currentMemberTab === 'info') {
-    body.innerHTML = `<div class="panel-body">
-      <div class="card mb-8" style="margin-bottom:12px;">
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
-          <div class="avatar" style="width:56px;height:56px;font-size:22px">${avatarLetter(m.name)}</div>
-          <div><div style="font-size:20px;font-weight:800">${m.name}</div>
-          <div style="color:var(--text-sub);font-size:13px">${fmtPhone(m.phone)}</div></div>
-        </div>
-        ${m.birthdate?`<div class="flex-between mb-8"><span style="color:var(--text-sub)">생년월일</span><span>${fmtDate(m.birthdate)}</span></div>`:''}
-        ${m.gender?`<div class="flex-between mb-8"><span style="color:var(--text-sub)">성별</span><span>${m.gender}</span></div>`:''}
-        ${m.joinDate?`<div class="flex-between mb-8"><span style="color:var(--text-sub)">가입일</span><span>${fmtDate(m.joinDate)}</span></div>`:''}
-        ${m.lastVisit?`<div class="flex-between mb-8"><span style="color:var(--text-sub)">최근방문</span><span>${fmtDate(m.lastVisit)}</span></div>`:''}
-        ${m.memo?`<div style="margin-top:8px;padding:10px;background:var(--bg);border-radius:8px;font-size:13px">${m.memo}</div>`:''}
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-outline" style="flex:1" onclick="openAddBookingForMember('${m.id}')">예약 추가</button>
-        <button class="btn btn-primary" style="flex:1" onclick="openAddTicketForMember('${m.id}')">이용권 추가</button>
-      </div>
-    </div>`;
-  } else if (currentMemberTab === 'bookings') {
-    const bs = appData.bookings.filter(b=>b.memberId===m.id).sort((a,b)=>b.date.localeCompare(a.date));
-    body.innerHTML = `<div>${bs.length?bs.map(b=>`
-      <div class="list-item" onclick="openEditBooking('${b.id}')">
-        <div class="info">
-          <div class="name">${b.date} ${b.time||''}</div>
-          <div class="sub">${b.service||''} · ${fmtWon(b.price)}</div>
-        </div>
-        <div class="badge badge-${b.status==='done'?'blue':b.status==='confirmed'?'green':b.status==='cancelled'?'gray':'orange'}">${statusLabel(b.status)}</div>
-      </div>`).join('') : '<div class="empty-state"><p>예약 이력이 없습니다</p></div>'}</div>`;
-  } else if (currentMemberTab === 'tickets') {
-    const ts = appData.tickets.filter(t=>t.memberId===m.id);
-    body.innerHTML = `<div style="padding:12px 14px;">
-      ${ts.length?ts.map(t=>{
-        const pct = t.total>0?Math.min(100,Math.round(t.remaining/t.total*100)):0;
-        return `<div class="ticket-card" onclick="openTicketPanel('${t.id}')">
-          <div class="tc-header"><div><div class="tc-name">${t.name||'이용권'}</div></div>
-          <div class="badge ${pct<20?'badge-red':pct<40?'badge-orange':'badge-green'}">${pct}%</div></div>
-          <div class="ticket-bar"><div class="ticket-fill ${pct<20?'critical':pct<40?'low':''}" style="width:${pct}%"></div></div>
-          <div class="ticket-stats"><span>잔여 <strong>${t.type==='count'?t.remaining+'회':fmtWon(t.remaining)}</strong></span>
-          <span>${t.expireDate?fmtDate(t.expireDate):''}</span></div>
-        </div>`;
-      }).join(''):'<div class="empty-state"><p>이용권이 없습니다</p></div>'}
-      <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="openAddTicketForMember('${m.id}')">이용권 추가</button>
-    </div>`;
-  }
-}
-
-function editCurrentMember() {
-  openEditMember(currentMemberId);
-}
-
-// =============================================
-// TICKETS
-// =============================================
+// ── TICKETS ──
 function renderTickets() {
-  const q = (document.getElementById('ticketSearch').value||'').toLowerCase();
-  let list = appData.tickets.filter(t =>
-    !q || (t.name||'').toLowerCase().includes(q) || (t.memberName||'').toLowerCase().includes(q)
-  );
-  const el = document.getElementById('ticketList');
+  const q=(document.getElementById('ticketQ').value||'').toLowerCase();
+  let list=D.tickets.filter(t=>!q||(t.name||'').toLowerCase().includes(q)||(t.memberName||'').toLowerCase().includes(q));
+  list.sort((a,b)=>(b.remaining>0?1:0)-(a.remaining>0?1:0)||(b.createdAt||'').localeCompare(a.createdAt||''));
+  const el=document.getElementById('ticketList');
   if (!list.length) {
-    el.innerHTML = '<div class="empty-state"><div class="icon">🎫</div><p>이용권이 없습니다</p></div>';
-    return;
+    el.innerHTML='<div class="empty"><div class="empty-icon">🎫</div><p>이용권이 없습니다</p></div>'; return;
   }
-  // active first
-  list.sort((a,b) => {
-    const aActive = a.remaining>0 ? 0 : 1;
-    const bActive = b.remaining>0 ? 0 : 1;
-    return aActive - bActive || (b.createdAt||'').localeCompare(a.createdAt||'');
-  });
-  el.innerHTML = list.map(t => {
-    const pct = t.total>0?Math.min(100,Math.round(t.remaining/t.total*100)):0;
-    const cls = pct<20?'critical':pct<40?'low':'';
-    const expired = t.expireDate && daysUntil(t.expireDate) < 0;
-    return `<div class="ticket-card ${expired?'':''}${t.remaining<=0?'':''}">
-      <div class="tc-header" onclick="openTicketPanel('${t.id}')">
+  el.innerHTML=list.map(t=>{
+    const pct=t.total>0?Math.min(100,Math.round(t.remaining/t.total*100)):0;
+    const cls=pct<20?'tk-fill-lo':pct<50?'tk-fill-md':'tk-fill-hi';
+    const expired=t.expireDate&&daysLeft(t.expireDate)<0;
+    return `<div class="tk-card">
+      <div class="tk-head" onclick="openTicketPanel('${t.id}')">
         <div>
-          <div class="tc-name">${t.name||'이용권'} ${expired?'<span class="badge badge-red">만료</span>':t.remaining<=0?'<span class="badge badge-gray">소진</span>':''}</div>
-          <div class="tc-member">👤 ${t.memberName||''} · ${t.type==='count'?'횟수권':'금액권'}</div>
+          <div class="tk-name">${t.name||'이용권'} ${expired?'<span class="badge b-red">만료</span>':t.remaining<=0?'<span class="badge b-gray">소진</span>':''}</div>
+          <div class="tk-member">👤 ${t.memberName||''} · ${t.type==='count'?'횟수권':'금액권'}</div>
         </div>
-        <div class="badge ${pct<20?'badge-red':pct<40?'badge-orange':'badge-green'}">${pct}%</div>
+        <span class="badge ${pct<20?'b-red':pct<50?'b-orange':'b-green'}">${pct}%</span>
       </div>
-      <div class="ticket-bar"><div class="ticket-fill ${cls}" style="width:${pct}%"></div></div>
-      <div class="ticket-stats">
-        <span>잔여 <strong>${t.type==='count'?t.remaining+'회':fmtWon(t.remaining)}</strong></span>
-        <span>${t.expireDate?'만료 '+fmtDate(t.expireDate):''}</span>
+      <div class="tk-bar"><div class="tk-fill ${cls}" style="width:${pct}%"></div></div>
+      <div class="tk-stats">
+        <span>잔여 <strong>${t.type==='count'?t.remaining+'회':won(t.remaining)}</strong></span>
+        <span>${t.expireDate?fdate(t.expireDate):''}</span>
       </div>
-      ${t.remaining>0&&!expired?`<button class="btn btn-outline btn-sm" style="margin-top:10px;width:100%" onclick="openDeduct('${t.id}')">차감하기</button>`:''}
+      ${t.remaining>0&&!expired?`<button class="btn btn-outline btn-sm btn-block" style="margin-top:10px" onclick="openDeduct('${t.id}')">차감하기</button>`:''}
     </div>`;
   }).join('');
 }
 
-// =============================================
-// TICKET PANEL
-// =============================================
-function openTicketPanel(id) {
-  currentTicketId = id;
-  const t = appData.tickets.find(x=>x.id===id);
-  if (!t) return;
-  document.getElementById('ticketPanelTitle').textContent = t.name||'이용권';
-  openPanel('ticketPanel');
-  renderTicketPanelBody();
-}
-
-function renderTicketPanelBody() {
-  const t = appData.tickets.find(x=>x.id===currentTicketId);
-  if (!t) return;
-  const hist = appData.ticketHistory.filter(h=>h.ticketId===t.id).sort((a,b)=>b.date.localeCompare(a.date));
-  const pct = t.total>0?Math.min(100,Math.round(t.remaining/t.total*100)):0;
-  document.getElementById('ticketPanelBody').innerHTML = `
-    <div class="panel-body">
-      <div class="card" style="margin-bottom:12px;">
-        <div class="flex-between mb-8"><span style="color:var(--text-sub)">회원</span><strong>${t.memberName||''}</strong></div>
-        <div class="flex-between mb-8"><span style="color:var(--text-sub)">종류</span><span>${t.type==='count'?'횟수권':'금액권'}</span></div>
-        <div class="flex-between mb-8"><span style="color:var(--text-sub)">${t.type==='count'?'총횟수':'충전금액'}</span><strong>${t.type==='count'?t.total+'회':fmtWon(t.total)}</strong></div>
-        <div class="flex-between mb-8"><span style="color:var(--text-sub)">실결제금액</span><span>${fmtWon(t.paidAmount)}</span></div>
-        <div class="flex-between mb-8"><span style="color:var(--text-sub)">잔여</span><strong style="color:var(--primary-dark)">${t.type==='count'?t.remaining+'회':fmtWon(t.remaining)}</strong></div>
-        ${t.expireDate?`<div class="flex-between mb-8"><span style="color:var(--text-sub)">만료일</span><span>${fmtDate(t.expireDate)}</span></div>`:''}
-        <div class="ticket-bar" style="margin:12px 0 4px"><div class="ticket-fill ${pct<20?'critical':pct<40?'low':''}" style="width:${pct}%"></div></div>
-        ${t.memo?`<div style="margin-top:8px;font-size:13px;color:var(--text-sub)">${t.memo}</div>`:''}
-      </div>
-      ${t.remaining>0?`<button class="btn btn-primary" style="width:100%;margin-bottom:12px" onclick="openDeduct('${t.id}')">차감하기</button>`:''}
-      <div class="section-title" style="margin-bottom:8px">사용이력</div>
-      ${hist.length?hist.map(h=>`
-        <div class="list-item" style="background:var(--card);border-radius:10px;margin-bottom:6px;">
-          <div class="info">
-            <div class="name">${h.date} ${h.memo||''}</div>
-            <div class="sub">${h.serviceAmount?'서비스: '+fmtWon(h.serviceAmount):''}</div>
-          </div>
-          <div class="right">
-            <div class="amount-negative">-${t.type==='count'?h.amount+'회':fmtWon(h.amount)}</div>
-            <div style="font-size:11px;color:var(--text-sub)">잔여 ${t.type==='count'?h.remaining+'회':fmtWon(h.remaining)}</div>
-          </div>
-        </div>`).join('') : '<div class="empty-state"><p>사용 이력이 없습니다</p></div>'}
-    </div>`;
-}
-
-function editCurrentTicket() {
-  openEditTicket(currentTicketId);
-}
-
-// =============================================
-// MORE MENU
-// =============================================
+// ── MORE MENU ──
 function renderMoreMenu() {
-  const items = [
-    {icon:'📊',label:'매출 통계',color:'#e8f5e9',fn:'openPanel("statsPanel"); renderStats();'},
-    {icon:'💰',label:'미수금 관리',color:'#fff3e0',fn:'openUnpaid()'},
-    {icon:'📋',label:'하루 마감 요약',color:'#e8eaf6',fn:'openClosing()'},
-    {icon:'💬',label:'단체 메시지',color:'#e3f2fd',fn:'openModal("modalBulkMsg"); updateBulkCount()'},
-    {icon:'⚙️',label:'업체 설정',color:'#fce4ec',fn:'openSettings()'},
-    {icon:'🛠',label:'서비스 관리',color:'#f3e5f5',fn:'openPanel("servicePanel"); renderServicePanel()'},
-    {icon:'🗂',label:'데이터 관리',color:'#e0f7fa',fn:'openPanel("dataPanel")'},
+  const items=[
+    {icon:'📊',label:'매출 통계',color:'#e8f5e9',fn:`openPanel('stats');renderStats()`},
+    {icon:'💰',label:'미수금 관리',color:'#fff3e0',fn:`openUnpaid()`},
+    {icon:'📋',label:'하루 마감 요약',color:'#e8eaf6',fn:`openClosing()`},
+    {icon:'⚙️',label:'업체 설정',color:'#fce4ec',fn:`openSettingsModal()`},
+    {icon:'🛠',label:'서비스 관리',color:'#f3e5f5',fn:`openPanel('pService');renderServicePanel()`},
+    {icon:'🗂',label:'데이터 관리',color:'#e0f7fa',fn:`openPanel('pData')`},
   ];
-  document.getElementById('moreMenuList').innerHTML = items.map(i=>`
-    <div class="more-menu-item" onclick="${i.fn}">
-      <div class="mi-icon" style="background:${i.color}">${i.icon}</div>
-      <div class="mi-label">${i.label}</div>
-      <div class="mi-arrow">›</div>
+  document.getElementById('moreMenu').innerHTML=items.map(i=>`
+    <div class="mm-item" onclick="${i.fn}">
+      <div class="mm-icon" style="background:${i.color}">${i.icon}</div>
+      <div class="mm-label">${i.label}</div>
+      <div class="mm-arr">›</div>
     </div>`).join('');
 }
 
-// =============================================
-// BOOKING MODAL
-// =============================================
-function openAddBooking(date) {
-  editingBookingId = null;
-  selectedMemberId = null;
-  selectedServiceName = '';
-  document.getElementById('modalBookingTitle').textContent = '예약 추가';
-  document.getElementById('bDate').value = date || calSelectedDate || todayStr();
-  document.getElementById('bTime').value = '';
-  document.getElementById('bDuration').value = '';
-  document.getElementById('bName').value = '';
-  document.getElementById('bPhone').value = '';
-  document.getElementById('bPrice').value = '';
-  document.getElementById('bPayMethod').value = 'card';
-  document.getElementById('bStatus').value = 'confirmed';
-  document.getElementById('bMemo').value = '';
-  document.getElementById('memberSelectText').textContent = '회원 선택...';
-  document.getElementById('serviceSelectText').textContent = '서비스 선택...';
-  document.getElementById('bDeleteWrap').style.display = 'none';
-  document.getElementById('bTicketWrap').style.display = 'none';
-  openModal('modalBooking');
-  populateMemberDropdown();
-  populateServiceDropdown();
+// ── MODAL HELPERS ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// overlay click to close
+document.querySelectorAll('.modal-ov').forEach(ov=>{
+  ov.addEventListener('click', e=>{ if(e.target===ov) closeModal(ov.id); });
+});
+
+// ── PANEL HELPERS ──
+function openPanel(id) {
+  document.getElementById('ov'+cap(id))?.classList.add('open');
+  document.getElementById(id)?.classList.add('open');
+}
+function closePanel(id) {
+  document.getElementById('ov'+cap(id))?.classList.remove('open');
+  document.getElementById(id)?.classList.remove('open');
+}
+function cap(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
+
+// ── CUSTOM SELECT ──
+function toggleCS(id) {
+  const btn=document.getElementById(id+'Btn');
+  const drop=document.getElementById(id+'Drop');
+  const isOpen=drop.classList.contains('open');
+  // close all
+  document.querySelectorAll('.cs-drop').forEach(d=>d.classList.remove('open'));
+  document.querySelectorAll('.cs-btn').forEach(b=>b.classList.remove('open'));
+  if (!isOpen) { drop.classList.add('open'); btn.classList.add('open'); }
+}
+function filterCS(id) {
+  const q=document.getElementById(id+'Q')?.value.toLowerCase()||'';
+  document.querySelectorAll(`#${id}List .cs-opt`).forEach(el=>{
+    el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
+document.addEventListener('click', e=>{
+  if (!e.target.closest('.cs-wrap')) {
+    document.querySelectorAll('.cs-drop').forEach(d=>d.classList.remove('open'));
+    document.querySelectorAll('.cs-btn').forEach(b=>b.classList.remove('open'));
+  }
+});
+
+function populateMemberCS() {
+  document.getElementById('csMemberList').innerHTML=
+    `<div class="cs-opt" onclick="selMemberCS(null,'직접입력')"><em style="color:var(--text3)">직접 입력</em></div>`+
+    D.members.map(m=>`<div class="cs-opt" onclick="selMemberCS('${m.id}','${m.name}')">
+      ${m.name}<div class="cs-opt-sub">${fphone(m.phone)}</div></div>`).join('');
+}
+function selMemberCS(id, name) {
+  document.getElementById('csMemberDrop').classList.remove('open');
+  document.getElementById('csMemberBtn').classList.remove('open');
+  document.getElementById('csMemberTxt').textContent=name;
+  selMemberId=id||null;
+  if (id) {
+    const m=D.members.find(x=>x.id===id);
+    if (m) { document.getElementById('bName').value=m.name; document.getElementById('bPhone').value=m.phone||''; }
+    updateTicketSel(id);
+  } else { document.getElementById('bTicketWrap').style.display='none'; }
 }
 
-function openAddBookingForMember(memberId) {
-  openAddBooking();
-  setMemberInBooking(memberId);
+function populateServiceCS() {
+  document.getElementById('csServiceList').innerHTML=
+    D.services.map(s=>`<div class="cs-opt" onclick="selServiceCS('${s.name}',${s.price||0},${s.duration||0})">
+      ${s.name}<div class="cs-opt-sub">${won(s.price)}</div></div>`).join('')+
+    `<div class="cs-opt" onclick="selServiceCS('',0,0)"><em style="color:var(--text3)">직접 입력</em></div>`;
+}
+function selServiceCS(name, price, dur) {
+  document.getElementById('csServiceDrop').classList.remove('open');
+  document.getElementById('csServiceBtn').classList.remove('open');
+  document.getElementById('csServiceTxt').textContent=name||'직접 입력';
+  if (price) document.getElementById('bPrice').value=price;
+  if (dur) document.getElementById('bDuration').value=dur;
 }
 
-function setMemberInBooking(memberId) {
-  const m = appData.members.find(x=>x.id===memberId);
-  if (!m) return;
-  selectedMemberId = memberId;
-  document.getElementById('memberSelectText').textContent = m.name;
-  document.getElementById('bName').value = m.name;
-  document.getElementById('bPhone').value = m.phone||'';
-  updateTicketDropdown(memberId);
+function populateTkMemberCS() {
+  document.getElementById('csTkMemberList').innerHTML=
+    D.members.map(m=>`<div class="cs-opt" onclick="selTkMemberCS('${m.id}','${m.name}')">
+      ${m.name}<div class="cs-opt-sub">${fphone(m.phone)}</div></div>`).join('');
+}
+function selTkMemberCS(id, name) {
+  document.getElementById('csTkMemberDrop').classList.remove('open');
+  document.getElementById('csTkMemberBtn').classList.remove('open');
+  document.getElementById('csTkMemberTxt').textContent=name;
+  document.getElementById('csTkMemberBtn').dataset.mid=id;
+}
+
+function updateTicketSel(memberId, selId) {
+  const ts=D.tickets.filter(t=>t.memberId===memberId&&t.remaining>0);
+  const wrap=document.getElementById('bTicketWrap');
+  const sel=document.getElementById('bTicket');
+  if (!ts.length) { wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  sel.innerHTML='<option value="">이용권 사용 안 함</option>'+
+    ts.map(t=>`<option value="${t.id}" ${t.id===selId?'selected':''}>${t.name} (${t.type==='count'?t.remaining+'회':won(t.remaining)})</option>`).join('');
+}
+
+// ── BOOKING MODAL ──
+function openBookingModal(date) {
+  editBid=null; selMemberId=null;
+  document.getElementById('mBookingTitle').textContent='예약 추가';
+  document.getElementById('bDate').value=date||calSel||today();
+  document.getElementById('bTime').value='';
+  document.getElementById('bDuration').value='';
+  document.getElementById('bName').value='';
+  document.getElementById('bPhone').value='';
+  document.getElementById('bPrice').value='';
+  document.getElementById('bPay').value='card';
+  document.getElementById('bStatus').value='confirmed';
+  document.getElementById('bMemo').value='';
+  document.getElementById('csMemberTxt').textContent='회원 선택 또는 직접 입력';
+  document.getElementById('csServiceTxt').textContent='서비스 선택';
+  document.getElementById('bDelWrap').style.display='none';
+  document.getElementById('bTicketWrap').style.display='none';
+  populateMemberCS(); populateServiceCS();
+  openModal('mBooking');
 }
 
 function openEditBooking(id) {
-  const b = appData.bookings.find(x=>x.id===id);
-  if (!b) return;
-  editingBookingId = id;
-  selectedMemberId = b.memberId||null;
-  document.getElementById('modalBookingTitle').textContent = '예약 수정';
-  document.getElementById('bDate').value = b.date||'';
-  document.getElementById('bTime').value = b.time||'';
-  document.getElementById('bDuration').value = b.duration||'';
-  document.getElementById('bName').value = b.name||'';
-  document.getElementById('bPhone').value = b.phone||'';
-  document.getElementById('bPrice').value = b.price||'';
-  document.getElementById('bPayMethod').value = b.payMethod||'card';
-  document.getElementById('bStatus').value = b.status||'confirmed';
-  document.getElementById('bMemo').value = b.memo||'';
-  document.getElementById('memberSelectText').textContent = b.memberId ?
-    (appData.members.find(m=>m.id===b.memberId)||{}).name||b.name : b.name||'회원 선택...';
-  document.getElementById('serviceSelectText').textContent = b.service||'서비스 선택...';
-  selectedServiceName = b.service||'';
-  document.getElementById('bDeleteWrap').style.display = 'block';
-  if (b.memberId) updateTicketDropdown(b.memberId, b.ticketId);
-  openModal('modalBooking');
-  populateMemberDropdown();
-  populateServiceDropdown();
+  const b=D.bookings.find(x=>x.id===id); if (!b) return;
+  editBid=id; selMemberId=b.memberId||null;
+  document.getElementById('mBookingTitle').textContent='예약 수정';
+  document.getElementById('bDate').value=b.date||'';
+  document.getElementById('bTime').value=b.time||'';
+  document.getElementById('bDuration').value=b.duration||'';
+  document.getElementById('bName').value=b.name||'';
+  document.getElementById('bPhone').value=b.phone||'';
+  document.getElementById('bPrice').value=b.price||'';
+  document.getElementById('bPay').value=b.payMethod||'card';
+  document.getElementById('bStatus').value=b.status||'confirmed';
+  document.getElementById('bMemo').value=b.memo||'';
+  document.getElementById('csMemberTxt').textContent=b.memberId?(D.members.find(m=>m.id===b.memberId)||{}).name||b.name:b.name||'회원 선택 또는 직접 입력';
+  document.getElementById('csServiceTxt').textContent=b.service||'서비스 선택';
+  document.getElementById('bDelWrap').style.display='block';
+  if (b.memberId) updateTicketSel(b.memberId, b.ticketId);
+  populateMemberCS(); populateServiceCS();
+  openModal('mBooking');
 }
 
 async function saveBooking() {
-  const date = document.getElementById('bDate').value;
-  const name = document.getElementById('bName').value.trim();
-  const time = document.getElementById('bTime').value;
-  const service = document.getElementById('serviceSelectText').textContent;
-  if (!date || !name) return showToast('날짜와 이름은 필수입니다', true);
+  const date=document.getElementById('bDate').value;
+  const name=document.getElementById('bName').value.trim();
+  if (!date||!name) return toast('날짜와 이름은 필수입니다',true);
 
-  const prevStatus = editingBookingId ? (appData.bookings.find(b=>b.id===editingBookingId)||{}).status : null;
-  const newStatus = document.getElementById('bStatus').value;
+  const prevStatus=editBid?(D.bookings.find(b=>b.id===editBid)||{}).status:null;
+  const newStatus=document.getElementById('bStatus').value;
+  const svcTxt=document.getElementById('csServiceTxt').textContent;
+  const service=svcTxt==='서비스 선택'||svcTxt==='직접 입력'?'':svcTxt;
+  const phone=document.getElementById('bPhone').value;
 
-  const booking = {
-    id: editingBookingId || uid(),
-    date, time,
-    name,
-    phone: document.getElementById('bPhone').value,
-    memberId: selectedMemberId||null,
-    service: service !== '서비스 선택...' ? service : document.getElementById('bName').value,
-    duration: parseInt(document.getElementById('bDuration').value)||null,
-    price: parseInt(document.getElementById('bPrice').value)||0,
-    status: newStatus,
-    payMethod: document.getElementById('bPayMethod').value,
-    memo: document.getElementById('bMemo').value,
-    type: 'normal',
-    createdAt: editingBookingId ? undefined : new Date().toISOString()
+  const bk={
+    id:editBid||uid(), date, time:document.getElementById('bTime').value,
+    name, phone, memberId:selMemberId||null,
+    service, duration:parseInt(document.getElementById('bDuration').value)||null,
+    price:parseInt(document.getElementById('bPrice').value)||0,
+    status:newStatus, payMethod:document.getElementById('bPay').value,
+    memo:document.getElementById('bMemo').value, type:'normal',
+    createdAt:editBid?undefined:new Date().toISOString()
   };
+  const ticketSel=document.getElementById('bTicket').value;
+  if (ticketSel&&newStatus==='done') { bk.ticketId=ticketSel; bk.type='ticketUse'; }
 
-  // ticket use
-  const ticketSel = document.getElementById('bTicket').value;
-  if (ticketSel && newStatus === 'done') {
-    booking.ticketId = ticketSel;
-    booking.type = 'ticketUse';
+  if (editBid) {
+    const i=D.bookings.findIndex(b=>b.id===editBid);
+    D.bookings[i]={...D.bookings[i],...bk};
+  } else { bk.createdAt=new Date().toISOString(); D.bookings.push(bk); }
+
+  if (selMemberId&&newStatus==='done') {
+    const m=D.members.find(x=>x.id===selMemberId); if (m) m.lastVisit=date;
   }
 
-  if (editingBookingId) {
-    const idx = appData.bookings.findIndex(b=>b.id===editingBookingId);
-    appData.bookings[idx] = { ...appData.bookings[idx], ...booking };
-  } else {
-    booking.createdAt = new Date().toISOString();
-    appData.bookings.push(booking);
-  }
+  if (!editBid&&newStatus==='confirmed'&&phone)
+    alim(phone,TPL.CONFIRM,{'#{고객명}':name,'#{날짜}':fdate(date),'#{시간}':bk.time,'#{서비스}':service,'#{소요시간}':bk.duration+''});
+  if (prevStatus!=='cancelled'&&newStatus==='cancelled'&&phone)
+    alim(phone,TPL.CANCEL,{'#{고객명}':name,'#{날짜}':fdate(date),'#{시간}':bk.time,'#{서비스}':service});
 
-  // update member lastVisit
-  if (selectedMemberId && newStatus === 'done') {
-    const m = appData.members.find(x=>x.id===selectedMemberId);
-    if (m) m.lastVisit = date;
-  }
-
-  // alimtalk
-  const phone = document.getElementById('bPhone').value;
-  if (!editingBookingId && newStatus === 'confirmed' && phone) {
-    sendAlimtalk(phone, TPL.CONFIRM, {
-      '#{고객명}': name, '#{날짜}': fmtDate(date), '#{시간}': time,
-      '#{서비스}': service, '#{소요시간}': (document.getElementById('bDuration').value||'')+''
-    });
-  }
-  if (prevStatus !== 'cancelled' && newStatus === 'cancelled' && phone) {
-    sendAlimtalk(phone, TPL.CANCEL, {
-      '#{고객명}': name, '#{날짜}': fmtDate(date), '#{시간}': time, '#{서비스}': service
-    });
-  }
-
-  await saveData();
-  closeModal('modalBooking');
-  renderAll();
-  showToast(editingBookingId ? '예약이 수정되었습니다' : '예약이 추가되었습니다');
+  await saveData(); closeModal('mBooking'); renderAll();
+  toast(editBid?'예약이 수정되었습니다':'예약이 추가되었습니다');
 }
 
 async function deleteBooking() {
-  if (!editingBookingId) return;
-  if (!confirm('예약을 삭제하시겠습니까?')) return;
-  appData.bookings = appData.bookings.filter(b=>b.id!==editingBookingId);
-  await saveData();
-  closeModal('modalBooking');
-  renderAll();
-  showToast('예약이 삭제되었습니다');
+  if (!editBid||!confirm('예약을 삭제하시겠습니까?')) return;
+  D.bookings=D.bookings.filter(b=>b.id!==editBid);
+  await saveData(); closeModal('mBooking'); renderAll(); toast('삭제되었습니다');
 }
 
-// =============================================
-// MEMBER DROPDOWN in BOOKING MODAL
-// =============================================
-function populateMemberDropdown() {
-  const list = document.getElementById('memberDropdownList');
-  list.innerHTML = '<div class="custom-select-option" onclick="selectMemberInBooking(null,\'직접입력\')"><em style="color:var(--text-sub)">회원 없이 직접입력</em></div>' +
-    appData.members.map(m => `
-      <div class="custom-select-option" onclick="selectMemberInBooking('${m.id}','${m.name}')">
-        ${m.name} <span class="opt-sub">${fmtPhone(m.phone)}</span>
-      </div>`).join('');
-}
-
-function toggleMemberDropdown() {
-  const d = document.getElementById('memberSelectDropdown');
-  d.classList.toggle('hidden');
-  if (!d.classList.contains('hidden')) document.getElementById('memberDropdownSearch').focus();
-}
-
-function filterMemberDropdown() {
-  const q = document.getElementById('memberDropdownSearch').value.toLowerCase();
-  document.querySelectorAll('#memberDropdownList .custom-select-option').forEach(el => {
-    el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
-}
-
-function selectMemberInBooking(id, name) {
-  document.getElementById('memberSelectDropdown').classList.add('hidden');
-  if (!id) {
-    selectedMemberId = null;
-    document.getElementById('memberSelectText').textContent = '직접입력';
-    document.getElementById('bTicketWrap').style.display = 'none';
-    return;
-  }
-  setMemberInBooking(id);
-}
-
-function updateTicketDropdown(memberId, selectedTicketId) {
-  const tickets = appData.tickets.filter(t=>t.memberId===memberId&&t.remaining>0);
-  const wrap = document.getElementById('bTicketWrap');
-  const sel = document.getElementById('bTicket');
-  if (!tickets.length) { wrap.style.display='none'; return; }
-  wrap.style.display = 'block';
-  sel.innerHTML = '<option value="">이용권 사용 안 함</option>' +
-    tickets.map(t=>`<option value="${t.id}" ${t.id===selectedTicketId?'selected':''}>${t.name} (${t.type==='count'?t.remaining+'회':fmtWon(t.remaining)})</option>`).join('');
-}
-
-// =============================================
-// SERVICE DROPDOWN
-// =============================================
-function populateServiceDropdown() {
-  document.getElementById('serviceDropdownList').innerHTML =
-    appData.services.map(s => `
-      <div class="custom-select-option" onclick="selectService('${s.name}',${s.price},${s.duration||0})">
-        ${s.name} <span class="opt-sub">${fmtWon(s.price)}</span>
-      </div>`).join('') +
-    '<div class="custom-select-option" onclick="selectService(\'\',0,0)"><em style="color:var(--text-sub)">직접입력</em></div>';
-}
-
-function toggleServiceDropdown() {
-  const d = document.getElementById('serviceSelectDropdown');
-  d.classList.toggle('hidden');
-}
-
-function selectService(name, price, duration) {
-  document.getElementById('serviceSelectDropdown').classList.add('hidden');
-  document.getElementById('serviceSelectText').textContent = name || '직접입력';
-  if (price) document.getElementById('bPrice').value = price;
-  if (duration) document.getElementById('bDuration').value = duration;
-  selectedServiceName = name;
-}
-
-// =============================================
-// MEMBER MODAL
-// =============================================
-function openAddMember() {
-  editingMemberId = null;
-  document.getElementById('modalMemberTitle').textContent = '회원 추가';
-  document.getElementById('mName').value = '';
-  document.getElementById('mPhone').value = '';
-  document.getElementById('mBirthdate').value = '';
-  document.getElementById('mGender').value = '';
-  document.getElementById('mMemo').value = '';
-  document.getElementById('mDeleteWrap').style.display = 'none';
-  openModal('modalMember');
-}
-
-function openEditMember(id) {
-  const m = appData.members.find(x=>x.id===id);
-  if (!m) return;
-  editingMemberId = id;
-  document.getElementById('modalMemberTitle').textContent = '회원 수정';
-  document.getElementById('mName').value = m.name||'';
-  document.getElementById('mPhone').value = m.phone||'';
-  document.getElementById('mBirthdate').value = m.birthdate||'';
-  document.getElementById('mGender').value = m.gender||'';
-  document.getElementById('mMemo').value = m.memo||'';
-  document.getElementById('mDeleteWrap').style.display = 'block';
-  openModal('modalMember');
+// ── MEMBER MODAL ──
+function openMemberModal(id) {
+  editMid=id||null;
+  document.getElementById('mMemberTitle').textContent=id?'회원 수정':'회원 추가';
+  const m=id?D.members.find(x=>x.id===id):{};
+  document.getElementById('mName').value=m?.name||'';
+  document.getElementById('mPhone').value=m?.phone||'';
+  document.getElementById('mBirth').value=m?.birthdate||'';
+  document.getElementById('mGender').value=m?.gender||'';
+  document.getElementById('mMemo').value=m?.memo||'';
+  document.getElementById('mDelWrap').style.display=id?'block':'none';
+  openModal('mMember');
 }
 
 async function saveMember() {
-  const name = document.getElementById('mName').value.trim();
-  const phone = document.getElementById('mPhone').value.trim();
-  if (!name) return showToast('이름을 입력해주세요', true);
-
-  const member = {
-    id: editingMemberId || uid(),
-    name, phone,
-    birthdate: document.getElementById('mBirthdate').value,
-    gender: document.getElementById('mGender').value,
-    memo: document.getElementById('mMemo').value,
-    joinDate: editingMemberId ? undefined : todayStr(),
-    lastVisit: editingMemberId ? undefined : null
-  };
-
-  if (editingMemberId) {
-    const idx = appData.members.findIndex(m=>m.id===editingMemberId);
-    appData.members[idx] = { ...appData.members[idx], ...member };
-  } else {
-    member.joinDate = todayStr();
-    appData.members.push(member);
-  }
-
-  await saveData();
-  closeModal('modalMember');
-  if (currentMemberId === editingMemberId) {
-    document.getElementById('memberPanelName').textContent = name;
-    renderMemberPanelTab();
-  }
-  renderAll();
-  showToast(editingMemberId ? '회원 정보가 수정되었습니다' : '회원이 추가되었습니다');
+  const name=document.getElementById('mName').value.trim();
+  if (!name) return toast('이름을 입력해주세요',true);
+  const m={id:editMid||uid(), name, phone:document.getElementById('mPhone').value,
+    birthdate:document.getElementById('mBirth').value, gender:document.getElementById('mGender').value,
+    memo:document.getElementById('mMemo').value};
+  if (editMid) {
+    const i=D.members.findIndex(x=>x.id===editMid);
+    D.members[i]={...D.members[i],...m};
+  } else { m.joinDate=today(); m.lastVisit=null; D.members.push(m); }
+  await saveData(); closeModal('mMember');
+  if (curMid===editMid) { document.getElementById('pMemberName').textContent=name; renderMemberTab(); }
+  renderAll(); toast(editMid?'수정되었습니다':'회원이 추가되었습니다');
 }
 
 async function deleteMember() {
-  if (!editingMemberId) return;
-  if (!confirm('회원을 삭제하시겠습니까? 관련 예약은 유지됩니다.')) return;
-  appData.members = appData.members.filter(m=>m.id!==editingMemberId);
-  await saveData();
-  closeModal('modalMember');
-  closePanel('memberPanel');
-  renderAll();
-  showToast('회원이 삭제되었습니다');
+  if (!editMid||!confirm('회원을 삭제하시겠습니까?')) return;
+  D.members=D.members.filter(m=>m.id!==editMid);
+  await saveData(); closeModal('mMember'); closePanel('pMember'); renderAll(); toast('삭제되었습니다');
 }
 
-// =============================================
-// TICKET MODAL
-// =============================================
-function openAddTicket(memberId) {
-  editingTicketId = null;
-  document.getElementById('modalTicketTitle').textContent = '이용권 추가';
-  document.getElementById('tType').value = 'amount';
-  document.getElementById('tName').value = '';
-  document.getElementById('tTotal').value = '';
-  document.getElementById('tPaidAmount').value = '';
-  document.getElementById('tExpireDate').value = '';
-  document.getElementById('tMemo').value = '';
-  document.getElementById('tDeleteWrap').style.display = 'none';
-  document.getElementById('ticketMemberSelectText').textContent = '회원 선택...';
-  updateTicketForm();
-  openModal('modalTicket');
-  populateTicketMemberDropdown();
-  if (memberId) setTicketMember(memberId);
+// ── MEMBER PANEL ──
+function openMemberPanel(id) {
+  curMid=id; curMTab='info';
+  const m=D.members.find(x=>x.id===id); if (!m) return;
+  document.getElementById('pMemberName').textContent=m.name;
+  openPanel('pMember'); renderMemberTab();
+  document.querySelectorAll('#pMemberTabs .inner-tab').forEach((t,i)=>t.classList.toggle('on',i===0));
 }
-
-function openAddTicketForMember(memberId) {
-  openAddTicket(memberId);
+function editCurMember() { openMemberModal(curMid); }
+function switchMTab(tab) {
+  curMTab=tab;
+  const tabs=['info','bookings','tickets'];
+  document.querySelectorAll('#pMemberTabs .inner-tab').forEach((t,i)=>t.classList.toggle('on',tabs[i]===tab));
+  renderMemberTab();
 }
-
-function openEditTicket(id) {
-  const t = appData.tickets.find(x=>x.id===id);
-  if (!t) return;
-  editingTicketId = id;
-  document.getElementById('modalTicketTitle').textContent = '이용권 수정';
-  document.getElementById('tType').value = t.type||'amount';
-  document.getElementById('tName').value = t.name||'';
-  document.getElementById('tTotal').value = t.total||'';
-  document.getElementById('tPaidAmount').value = t.paidAmount||'';
-  document.getElementById('tExpireDate').value = t.expireDate||'';
-  document.getElementById('tMemo').value = t.memo||'';
-  document.getElementById('ticketMemberSelectText').textContent = t.memberName||'회원 선택...';
-  document.getElementById('tDeleteWrap').style.display = 'block';
-  updateTicketForm();
-  openModal('modalTicket');
-  populateTicketMemberDropdown();
-}
-
-function updateTicketForm() {
-  const type = document.getElementById('tType').value;
-  document.getElementById('tTotalLabel').textContent = type==='count'?'총 횟수':'충전금액 (원)';
-}
-
-async function saveTicket() {
-  const memberText = document.getElementById('ticketMemberSelectText').textContent;
-  const memberId = document.getElementById('ticketMemberSelectBtn').dataset.memberId;
-  const total = parseInt(document.getElementById('tTotal').value)||0;
-  const paidAmount = parseInt(document.getElementById('tPaidAmount').value)||total;
-  if (!memberId && memberText === '회원 선택...') return showToast('회원을 선택해주세요', true);
-
-  const member = appData.members.find(m=>m.id===memberId);
-
-  const ticket = {
-    id: editingTicketId || uid(),
-    memberId: memberId||null,
-    memberName: member?.name || memberText,
-    type: document.getElementById('tType').value,
-    name: document.getElementById('tName').value || (document.getElementById('tType').value==='amount'?'금액권':'횟수권'),
-    total,
-    paidAmount,
-    remaining: editingTicketId ? undefined : total,
-    expireDate: document.getElementById('tExpireDate').value,
-    memo: document.getElementById('tMemo').value,
-    createdAt: editingTicketId ? undefined : new Date().toISOString()
-  };
-
-  if (editingTicketId) {
-    const idx = appData.tickets.findIndex(t=>t.id===editingTicketId);
-    appData.tickets[idx] = { ...appData.tickets[idx], ...ticket };
-    // update related booking
-    const t = appData.tickets[idx];
-    if (t.ticketSaleId) {
-      const bi = appData.bookings.findIndex(b=>b.id===t.ticketSaleId);
-      if (bi>=0) appData.bookings[bi].price = paidAmount;
-    }
+function renderMemberTab() {
+  const m=D.members.find(x=>x.id===curMid); if (!m) return;
+  const body=document.getElementById('pMemberBody');
+  if (curMTab==='info') {
+    body.innerHTML=`<div style="padding:14px;">
+      <div class="card" style="padding:18px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+          <div class="li-av" style="width:54px;height:54px;font-size:20px;">${av(m.name)}</div>
+          <div><div style="font-size:20px;font-weight:900;">${m.name}</div>
+          <div style="color:var(--text3);font-size:13px;">${fphone(m.phone)}</div></div>
+        </div>
+        ${m.birthdate?`<div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">생년월일</span><span>${fdate(m.birthdate)}</span></div>`:''}
+        ${m.gender?`<div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">성별</span><span>${m.gender}</span></div>`:''}
+        ${m.joinDate?`<div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">가입일</span><span>${fdate(m.joinDate)}</span></div>`:''}
+        ${m.lastVisit?`<div class="row-between" ><span style="color:var(--text3)">최근방문</span><span>${fdate(m.lastVisit)}</span></div>`:''}
+        ${m.memo?`<div style="margin-top:12px;padding:10px;background:var(--g8);border-radius:8px;font-size:13px;color:var(--text2);">${m.memo}</div>`:''}
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" style="flex:1" onclick="openBookingForMember('${m.id}')">예약 추가</button>
+        <button class="btn btn-primary" style="flex:1" onclick="openTicketForMember('${m.id}')">이용권 추가</button>
+      </div>
+    </div>`;
+  } else if (curMTab==='bookings') {
+    const bs=D.bookings.filter(b=>b.memberId===m.id).sort((a,b)=>b.date?.localeCompare(a.date));
+    body.innerHTML=bs.length?`<div class="card" style="margin:14px;">${bs.map(b=>`
+      <div class="li" onclick="openEditBooking('${b.id}')">
+        <div class="li-info"><div class="li-name">${b.date} ${b.time||''}</div><div class="li-sub">${b.service||''} · ${won(b.price)}</div></div>
+        <span class="badge ${stCls(b.status)}">${stLbl(b.status)}</span>
+      </div>`).join('')}</div>`:'<div class="empty"><p>예약 이력이 없습니다</p></div>';
   } else {
-    ticket.remaining = total;
-    ticket.createdAt = new Date().toISOString();
-    appData.tickets.push(ticket);
-    // create revenue booking
-    const saleBooking = {
-      id: uid(), date: todayStr(), time: '', name: ticket.memberName,
-      phone: member?.phone||'', memberId: memberId||null,
-      service: ticket.name+' 이용권 구매', price: paidAmount,
-      status: 'done', payMethod: 'card', type: 'ticketPayment',
-      ticketId: ticket.id, createdAt: new Date().toISOString()
-    };
-    ticket.ticketSaleId = saleBooking.id;
-    appData.bookings.push(saleBooking);
+    const ts=D.tickets.filter(t=>t.memberId===m.id);
+    body.innerHTML=`<div style="padding:14px;">${ts.length?ts.map(t=>tkCardHTML(t)).join(''):'<div class="empty"><p>이용권이 없습니다</p></div>'}
+      <button class="btn btn-primary btn-block" style="margin-top:8px;" onclick="openTicketForMember('${m.id}')">이용권 추가</button>
+    </div>`;
   }
-
-  await saveData();
-  closeModal('modalTicket');
-  renderAll();
-  if (currentTicketId === editingTicketId) renderTicketPanelBody();
-  showToast(editingTicketId ? '이용권이 수정되었습니다' : '이용권이 추가되었습니다');
 }
+function openBookingForMember(mid) { openBookingModal(); setTimeout(()=>selMemberCS(mid,D.members.find(m=>m.id===mid)?.name||''),50); }
+function openTicketForMember(mid) { openTicketModal(mid); }
 
+// ── TICKET MODAL ──
+function openTicketModal(memberId) {
+  editTid=null;
+  document.getElementById('mTicketTitle').textContent='이용권 추가';
+  document.getElementById('tType').value='amount';
+  document.getElementById('tName').value='';
+  document.getElementById('tTotal').value='';
+  document.getElementById('tPaid').value='';
+  document.getElementById('tExpire').value='';
+  document.getElementById('tMemo').value='';
+  document.getElementById('tDelWrap').style.display='none';
+  document.getElementById('csTkMemberTxt').textContent='회원 선택';
+  document.getElementById('csTkMemberBtn').dataset.mid='';
+  updateTicketForm();
+  populateTkMemberCS();
+  if (memberId) {
+    const m=D.members.find(x=>x.id===memberId);
+    if (m) { document.getElementById('csTkMemberTxt').textContent=m.name; document.getElementById('csTkMemberBtn').dataset.mid=m.id; }
+  }
+  openModal('mTicket');
+}
+function openEditTicketModal(id) {
+  const t=D.tickets.find(x=>x.id===id); if (!t) return;
+  editTid=id;
+  document.getElementById('mTicketTitle').textContent='이용권 수정';
+  document.getElementById('tType').value=t.type||'amount';
+  document.getElementById('tName').value=t.name||'';
+  document.getElementById('tTotal').value=t.total||'';
+  document.getElementById('tPaid').value=t.paidAmount||'';
+  document.getElementById('tExpire').value=t.expireDate||'';
+  document.getElementById('tMemo').value=t.memo||'';
+  document.getElementById('tDelWrap').style.display='block';
+  document.getElementById('csTkMemberTxt').textContent=t.memberName||'회원 선택';
+  document.getElementById('csTkMemberBtn').dataset.mid=t.memberId||'';
+  updateTicketForm(); populateTkMemberCS(); openModal('mTicket');
+}
+function updateTicketForm() {
+  document.getElementById('tTotalLabel').textContent=document.getElementById('tType').value==='count'?'총 횟수':'충전금액 (원)';
+}
+async function saveTicket() {
+  const mid=document.getElementById('csTkMemberBtn').dataset.mid;
+  const total=parseInt(document.getElementById('tTotal').value)||0;
+  const paid=parseInt(document.getElementById('tPaid').value)||total;
+  if (!mid) return toast('회원을 선택해주세요',true);
+  const member=D.members.find(m=>m.id===mid);
+  const tk={id:editTid||uid(), memberId:mid, memberName:member?.name||'',
+    type:document.getElementById('tType').value,
+    name:document.getElementById('tName').value||'이용권',
+    total, paidAmount:paid,
+    remaining:editTid?undefined:total,
+    expireDate:document.getElementById('tExpire').value,
+    memo:document.getElementById('tMemo').value,
+    createdAt:editTid?undefined:new Date().toISOString()};
+  if (editTid) {
+    const i=D.tickets.findIndex(t=>t.id===editTid);
+    D.tickets[i]={...D.tickets[i],...tk};
+    const t2=D.tickets[i];
+    if (t2.ticketSaleId) { const bi=D.bookings.findIndex(b=>b.id===t2.ticketSaleId); if(bi>=0) D.bookings[bi].price=paid; }
+  } else {
+    tk.remaining=total; tk.createdAt=new Date().toISOString();
+    D.tickets.push(tk);
+    const sale={id:uid(), date:today(), time:'', name:tk.memberName,
+      phone:member?.phone||'', memberId:mid, service:tk.name+' 이용권 구매',
+      price:paid, status:'done', payMethod:'card', type:'ticketPayment',
+      ticketId:tk.id, createdAt:new Date().toISOString()};
+    tk.ticketSaleId=sale.id; D.bookings.push(sale);
+  }
+  await saveData(); closeModal('mTicket');
+  if (curTid===editTid) renderTicketPanel();
+  renderAll(); toast(editTid?'수정되었습니다':'이용권이 추가되었습니다');
+}
 async function deleteTicket() {
-  if (!editingTicketId) return;
-  if (!confirm('이용권을 삭제하시겠습니까?')) return;
-  const t = appData.tickets.find(x=>x.id===editingTicketId);
-  if (t?.ticketSaleId) appData.bookings = appData.bookings.filter(b=>b.id!==t.ticketSaleId);
-  appData.tickets = appData.tickets.filter(t=>t.id!==editingTicketId);
-  appData.ticketHistory = appData.ticketHistory.filter(h=>h.ticketId!==editingTicketId);
-  await saveData();
-  closeModal('modalTicket');
-  closePanel('ticketPanel');
-  renderAll();
-  showToast('이용권이 삭제되었습니다');
+  if (!editTid||!confirm('이용권을 삭제하시겠습니까?')) return;
+  const t=D.tickets.find(x=>x.id===editTid);
+  if (t?.ticketSaleId) D.bookings=D.bookings.filter(b=>b.id!==t.ticketSaleId);
+  D.tickets=D.tickets.filter(t=>t.id!==editTid);
+  D.ticketHistory=D.ticketHistory.filter(h=>h.ticketId!==editTid);
+  await saveData(); closeModal('mTicket'); closePanel('pTicket'); renderAll(); toast('삭제되었습니다');
 }
 
-// =============================================
-// TICKET MEMBER DROPDOWN
-// =============================================
-function populateTicketMemberDropdown() {
-  document.getElementById('ticketMemberDropdownList').innerHTML =
-    appData.members.map(m => `
-      <div class="custom-select-option" onclick="setTicketMember('${m.id}')">
-        ${m.name} <span class="opt-sub">${fmtPhone(m.phone)}</span>
-      </div>`).join('');
+// ── TICKET PANEL ──
+function openTicketPanel(id) {
+  curTid=id;
+  const t=D.tickets.find(x=>x.id===id); if (!t) return;
+  document.getElementById('pTicketTitle').textContent=t.name||'이용권';
+  openPanel('pTicket'); renderTicketPanel();
+}
+function editCurTicket() { openEditTicketModal(curTid); }
+function renderTicketPanel() {
+  const t=D.tickets.find(x=>x.id===curTid); if (!t) return;
+  const hist=D.ticketHistory.filter(h=>h.ticketId===t.id).sort((a,b)=>b.date?.localeCompare(a.date));
+  const pct=t.total>0?Math.min(100,Math.round(t.remaining/t.total*100)):0;
+  document.getElementById('pTicketBody').innerHTML=`
+    <div class="card" style="padding:18px;margin-bottom:12px;">
+      <div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">회원</span><strong>${t.memberName||''}</strong></div>
+      <div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">종류</span><span>${t.type==='count'?'횟수권':'금액권'}</span></div>
+      <div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">${t.type==='count'?'총횟수':'충전금액'}</span><strong>${t.type==='count'?t.total+'회':won(t.total)}</strong></div>
+      <div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">실결제</span><span>${won(t.paidAmount)}</span></div>
+      <div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">잔여</span><strong style="color:var(--g2);font-size:16px;">${t.type==='count'?t.remaining+'회':won(t.remaining)}</strong></div>
+      ${t.expireDate?`<div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">만료일</span><span>${fdate(t.expireDate)}</span></div>`:''}
+      <div class="tk-bar" style="margin:12px 0 4px;"><div class="tk-fill ${pct<20?'tk-fill-lo':pct<50?'tk-fill-md':'tk-fill-hi'}" style="width:${pct}%"></div></div>
+      ${t.memo?`<div style="margin-top:10px;font-size:13px;color:var(--text3);">${t.memo}</div>`:''}
+    </div>
+    ${t.remaining>0?`<button class="btn btn-primary btn-block" style="margin-bottom:16px;" onclick="openDeduct('${t.id}')">차감하기</button>`:''}
+    <div class="sec-title" style="margin-bottom:8px;">사용이력</div>
+    ${hist.length?hist.map(h=>`
+      <div class="card" style="padding:14px;margin-bottom:8px;">
+        <div class="row-between"><strong>${h.date}</strong><span style="color:var(--red);font-weight:700;">-${t.type==='count'?h.amount+'회':won(h.amount)}</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">잔여 ${t.type==='count'?h.remaining+'회':won(h.remaining)} ${h.memo?'· '+h.memo:''}</div>
+      </div>`).join(''):'<div class="empty"><p>사용 이력이 없습니다</p></div>'}`;
 }
 
-function toggleTicketMemberDropdown() {
-  document.getElementById('ticketMemberSelectDropdown').classList.toggle('hidden');
+// ── DEDUCT ──
+function openDeduct(id) {
+  deductTid=id;
+  const t=D.tickets.find(x=>x.id===id); if (!t) return;
+  document.getElementById('deductInfo').innerHTML=`<strong>${t.name}</strong> · ${t.memberName}<br>잔여: <strong style="color:var(--g2)">${t.type==='count'?t.remaining+'회':won(t.remaining)}</strong>${t.expireDate?` · 만료 ${fdate(t.expireDate)}`:''}`;
+  document.getElementById('deductLbl').textContent=t.type==='count'?'차감 횟수':'차감 금액 (원)';
+  document.getElementById('deductAmt').value='';
+  document.getElementById('deductSvc').value='';
+  document.getElementById('deductMemo').value='';
+  openModal('mDeduct');
 }
-
-function filterTicketMemberDropdown() {
-  const q = document.getElementById('ticketMemberSearch').value.toLowerCase();
-  document.querySelectorAll('#ticketMemberDropdownList .custom-select-option').forEach(el => {
-    el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
-}
-
-function setTicketMember(id) {
-  const m = appData.members.find(x=>x.id===id);
-  if (!m) return;
-  document.getElementById('ticketMemberSelectText').textContent = m.name;
-  document.getElementById('ticketMemberSelectBtn').dataset.memberId = id;
-  document.getElementById('ticketMemberSelectDropdown').classList.add('hidden');
-}
-
-// =============================================
-// TICKET DEDUCTION
-// =============================================
-function openDeduct(ticketId) {
-  deductTicketId = ticketId;
-  const t = appData.tickets.find(x=>x.id===ticketId);
-  if (!t) return;
-  document.getElementById('deductTicketInfo').innerHTML = `
-    <strong>${t.name}</strong> · ${t.memberName}<br>
-    잔여: <strong style="color:var(--primary-dark)">${t.type==='count'?t.remaining+'회':fmtWon(t.remaining)}</strong>
-    ${t.expireDate?`· 만료: ${fmtDate(t.expireDate)}`:''}`;
-  document.getElementById('deductAmountLabel').textContent = t.type==='count'?'차감 횟수':'차감 금액 (원)';
-  document.getElementById('deductAmount').value = '';
-  document.getElementById('deductService').value = '';
-  document.getElementById('deductMemo').value = '';
-  openModal('modalDeduct');
-}
-
 async function confirmDeduct() {
-  const t = appData.tickets.find(x=>x.id===deductTicketId);
-  if (!t) return;
-  const amount = parseInt(document.getElementById('deductAmount').value)||0;
-  if (!amount || amount > t.remaining) return showToast('유효한 차감 금액을 입력하세요', true);
-  const service = document.getElementById('deductService').value;
-  const memo = document.getElementById('deductMemo').value;
-
-  t.remaining -= amount;
-  const hist = {
-    id: uid(), ticketId: t.id, bookingId: null,
-    date: todayStr(), amount, serviceAmount: amount, remaining: t.remaining, memo: service||memo
-  };
-  appData.ticketHistory.push(hist);
-
-  // alimtalk
-  const member = appData.members.find(m=>m.id===t.memberId);
-  if (member?.phone) {
-    sendAlimtalk(member.phone, TPL.DEDUCT, {
-      '#{고객명}': t.memberName, '#{서비스}': service||t.name,
-      '#{사용금액}': t.type==='count'?amount+'회':fmtWon(amount),
-      '#{잔여금액}': t.type==='count'?t.remaining+'회':fmtWon(t.remaining),
-      '#{만료일}': t.expireDate?fmtDate(t.expireDate):'없음'
-    });
-    // low balance check
-    const pct = t.total>0?t.remaining/t.total:1;
-    if (pct <= 0.2 && !appData.settings.notifiedTickets?.includes(t.id+'_low')) {
-      sendAlimtalk(member.phone, TPL.LOW, {
-        '#{고객명}': t.memberName, '#{이용권명}': t.name,
-        '#{잔여금액}': t.type==='count'?t.remaining+'회':fmtWon(t.remaining),
-        '#{만료일}': t.expireDate?fmtDate(t.expireDate):'없음'
-      });
-      if (!appData.settings.notifiedTickets) appData.settings.notifiedTickets = [];
-      appData.settings.notifiedTickets.push(t.id+'_low');
+  const t=D.tickets.find(x=>x.id===deductTid); if (!t) return;
+  const amt=parseInt(document.getElementById('deductAmt').value)||0;
+  if (!amt||amt>t.remaining) return toast('유효한 차감 금액을 입력하세요',true);
+  const svc=document.getElementById('deductSvc').value;
+  t.remaining-=amt;
+  D.ticketHistory.push({id:uid(),ticketId:t.id,date:today(),amount:amt,serviceAmount:amt,remaining:t.remaining,memo:svc||document.getElementById('deductMemo').value});
+  const mem=D.members.find(m=>m.id===t.memberId);
+  if (mem?.phone) {
+    alim(mem.phone,TPL.DEDUCT,{'#{고객명}':t.memberName,'#{서비스}':svc||t.name,'#{사용금액}':t.type==='count'?amt+'회':won(amt),'#{잔여금액}':t.type==='count'?t.remaining+'회':won(t.remaining),'#{만료일}':t.expireDate?fdate(t.expireDate):'없음'});
+    const pct=t.total>0?t.remaining/t.total:1;
+    if (pct<=0.2&&!D.settings.notifiedTickets?.includes(t.id+'_low')) {
+      alim(mem.phone,TPL.LOW,{'#{고객명}':t.memberName,'#{이용권명}':t.name,'#{잔여금액}':t.type==='count'?t.remaining+'회':won(t.remaining),'#{만료일}':t.expireDate?fdate(t.expireDate):'없음'});
+      if (!D.settings.notifiedTickets) D.settings.notifiedTickets=[];
+      D.settings.notifiedTickets.push(t.id+'_low');
     }
   }
-
-  await saveData();
-  closeModal('modalDeduct');
-  renderAll();
-  if (currentTicketId === t.id) renderTicketPanelBody();
-  showToast('차감 완료');
+  await saveData(); closeModal('mDeduct'); renderAll();
+  if (curTid===t.id) renderTicketPanel();
+  toast('차감 완료');
 }
 
-// =============================================
-// TICKET EXPIRY CHECK
-// =============================================
-function checkTicketExpiry() {
-  const today = todayStr();
-  appData.tickets.forEach(t => {
-    if (!t.expireDate || t.remaining <= 0) return;
-    const days = daysUntil(t.expireDate);
-    if (days === 7 && !appData.settings.notifiedTickets?.includes(t.id+'_expire')) {
-      const m = appData.members.find(x=>x.id===t.memberId);
+// ── EXPIRY CHECK ──
+function checkExpiry() {
+  D.tickets.forEach(t=>{
+    if (!t.expireDate||t.remaining<=0) return;
+    if (daysLeft(t.expireDate)===7&&!D.settings.notifiedTickets?.includes(t.id+'_expire')) {
+      const m=D.members.find(x=>x.id===t.memberId);
       if (m?.phone) {
-        sendAlimtalk(m.phone, TPL.EXPIRE, {
-          '#{고객명}': t.memberName, '#{이용권명}': t.name,
-          '#{잔여금액}': t.type==='count'?t.remaining+'회':fmtWon(t.remaining),
-          '#{만료일}': fmtDate(t.expireDate)
-        });
-        if (!appData.settings.notifiedTickets) appData.settings.notifiedTickets = [];
-        appData.settings.notifiedTickets.push(t.id+'_expire');
+        alim(m.phone,TPL.EXPIRE,{'#{고객명}':t.memberName,'#{이용권명}':t.name,'#{잔여금액}':t.type==='count'?t.remaining+'회':won(t.remaining),'#{만료일}':fdate(t.expireDate)});
+        if (!D.settings.notifiedTickets) D.settings.notifiedTickets=[];
+        D.settings.notifiedTickets.push(t.id+'_expire');
       }
     }
   });
 }
 
-// =============================================
-// SERVICE PANEL
-// =============================================
-function renderServicePanel() {
-  const body = document.getElementById('servicePanelBody');
-  if (!appData.services.length) {
-    body.innerHTML = '<div class="empty-state" style="margin-top:24px"><div class="icon">🛠</div><p>서비스가 없습니다</p></div>';
-    return;
-  }
-  body.innerHTML = appData.services.map(s=>`
-    <div class="list-item" onclick="openEditService('${s.id}')">
-      <div class="info">
-        <div class="name">${s.name}</div>
-        <div class="sub">${fmtWon(s.price)} · ${s.duration||0}분 ${s.category?'· '+s.category:''}</div>
-      </div>
-      <div class="mi-arrow">›</div>
-    </div>`).join('');
-}
-
-function openAddService() {
-  editingServiceId = null;
-  document.getElementById('modalServiceTitle').textContent = '서비스 추가';
-  document.getElementById('svName').value = '';
-  document.getElementById('svPrice').value = '';
-  document.getElementById('svDuration').value = '';
-  document.getElementById('svCategory').value = '';
-  document.getElementById('svDeleteWrap').style.display = 'none';
-  openModal('modalService');
-}
-
-function openEditService(id) {
-  const s = appData.services.find(x=>x.id===id);
-  if (!s) return;
-  editingServiceId = id;
-  document.getElementById('modalServiceTitle').textContent = '서비스 수정';
-  document.getElementById('svName').value = s.name||'';
-  document.getElementById('svPrice').value = s.price||'';
-  document.getElementById('svDuration').value = s.duration||'';
-  document.getElementById('svCategory').value = s.category||'';
-  document.getElementById('svDeleteWrap').style.display = 'block';
-  openModal('modalService');
-}
-
-async function saveService() {
-  const name = document.getElementById('svName').value.trim();
-  if (!name) return showToast('서비스명을 입력해주세요', true);
-  const sv = {
-    id: editingServiceId || uid(),
-    name, price: parseInt(document.getElementById('svPrice').value)||0,
-    duration: parseInt(document.getElementById('svDuration').value)||0,
-    category: document.getElementById('svCategory').value
-  };
-  if (editingServiceId) {
-    const idx = appData.services.findIndex(s=>s.id===editingServiceId);
-    appData.services[idx] = sv;
-  } else {
-    appData.services.push(sv);
-  }
-  await saveData();
-  closeModal('modalService');
-  renderServicePanel();
-  showToast('저장되었습니다');
-}
-
-async function deleteService() {
-  if (!editingServiceId) return;
-  appData.services = appData.services.filter(s=>s.id!==editingServiceId);
-  await saveData();
-  closeModal('modalService');
-  renderServicePanel();
-  showToast('삭제되었습니다');
-}
-
-// =============================================
-// SETTINGS
-// =============================================
-function openSettings() {
-  const s = appData.settings;
-  document.getElementById('setShopName').value = s.shopName||'라임스킨';
-  document.getElementById('setMonthlyGoal').value = s.monthlyGoal||5000000;
-  document.getElementById('setApiKey').value = s.apiKey||'';
-  document.getElementById('setApiSecret').value = s.apiSecret||'';
-  document.getElementById('setSenderPhone').value = s.senderPhone||'';
-  openModal('modalSettings');
-}
-
-async function saveSettings() {
-  appData.settings.shopName = document.getElementById('setShopName').value;
-  appData.settings.monthlyGoal = parseInt(document.getElementById('setMonthlyGoal').value)||5000000;
-  appData.settings.apiKey = document.getElementById('setApiKey').value;
-  appData.settings.apiSecret = document.getElementById('setApiSecret').value;
-  appData.settings.senderPhone = document.getElementById('setSenderPhone').value;
-  await saveData();
-  closeModal('modalSettings');
-  renderAll();
-  showToast('설정이 저장되었습니다');
-}
-
-// =============================================
-// STATS
-// =============================================
+// ── STATS ──
 function renderStats() {
-  const body = document.getElementById('statsPanelBody');
-  const ym = todayStr().slice(0,7);
-  const thisMonth = appData.bookings.filter(b=>b.date&&b.date.startsWith(ym)&&isRevenue(b));
-  const totalMonth = thisMonth.reduce((s,b)=>s+(b.price||0),0);
-  const year = todayStr().slice(0,4);
-  const thisYear = appData.bookings.filter(b=>b.date&&b.date.startsWith(year)&&isRevenue(b));
-  const totalYear = thisYear.reduce((s,b)=>s+(b.price||0),0);
-  const unpaid = appData.bookings.filter(b=>b.payMethod==='unpaid'&&b.status!=='cancelled');
-  const unpaidTotal = unpaid.reduce((s,b)=>s+(b.price||0),0);
-
-  // monthly breakdown
-  const monthlyMap = {};
-  appData.bookings.filter(b=>b.date&&b.date.startsWith(year)&&isRevenue(b)).forEach(b=>{
-    const m = b.date.slice(0,7);
-    monthlyMap[m] = (monthlyMap[m]||0)+(b.price||0);
-  });
-
-  // service breakdown
-  const svcMap = {};
-  thisMonth.forEach(b=>{ svcMap[b.service||'기타'] = (svcMap[b.service||'기타']||0)+(b.price||0); });
-  const svcList = Object.entries(svcMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
-
-  body.innerHTML = `
+  const ym=today().slice(0,7), yr=today().slice(0,4);
+  const mBks=D.bookings.filter(b=>b.date?.startsWith(ym)&&isRev(b));
+  const yBks=D.bookings.filter(b=>b.date?.startsWith(yr)&&isRev(b));
+  const mSales=mBks.reduce((s,b)=>s+(b.price||0),0);
+  const ySales=yBks.reduce((s,b)=>s+(b.price||0),0);
+  const unpaid=D.bookings.filter(b=>b.payMethod==='unpaid'&&b.status!=='cancelled');
+  const upTotal=unpaid.reduce((s,b)=>s+(b.price||0),0);
+  const mmap={};
+  yBks.forEach(b=>{ const m=b.date.slice(0,7); mmap[m]=(mmap[m]||0)+(b.price||0); });
+  const svcmap={};
+  mBks.forEach(b=>{ svcmap[b.service||'기타']=(svcmap[b.service||'기타']||0)+(b.price||0); });
+  document.getElementById('statsBody').innerHTML=`
     <div class="stat-grid">
-      <div class="stat-card"><div class="s-label">이번달 매출</div><div class="s-value">${fmtWon(totalMonth)}</div><div class="s-sub">${thisMonth.length}건</div></div>
-      <div class="stat-card"><div class="s-label">올해 누적</div><div class="s-value">${fmtWon(totalYear)}</div><div class="s-sub">${thisYear.length}건</div></div>
-      <div class="stat-card"><div class="s-label">미수금</div><div class="s-value" style="color:var(--danger)">${fmtWon(unpaidTotal)}</div><div class="s-sub">${unpaid.length}건</div></div>
-      <div class="stat-card"><div class="s-label">활성 이용권</div><div class="s-value">${appData.tickets.filter(t=>t.remaining>0).length}</div><div class="s-sub">건</div></div>
+      <div class="stat-card"><div class="stat-label">이번달 매출</div><div class="stat-val">${won(mSales)}</div><div class="stat-sub">${mBks.length}건</div></div>
+      <div class="stat-card"><div class="stat-label">올해 누적</div><div class="stat-val">${won(ySales)}</div><div class="stat-sub">${yBks.length}건</div></div>
+      <div class="stat-card"><div class="stat-label">미수금</div><div class="stat-val" style="color:var(--red)">${won(upTotal)}</div><div class="stat-sub">${unpaid.length}건</div></div>
+      <div class="stat-card"><div class="stat-label">활성 이용권</div><div class="stat-val">${D.tickets.filter(t=>t.remaining>0).length}</div><div class="stat-sub">건</div></div>
     </div>
-    <div style="padding:0 14px;">
-      <div class="section-title" style="margin:12px 0 8px">월별 매출 (${year})</div>
-      ${Object.entries(monthlyMap).sort().map(([m,v])=>{
-        const pct = totalYear>0?Math.round(v/totalYear*100):0;
-        return `<div style="margin-bottom:8px;">
-          <div class="flex-between" style="margin-bottom:3px;font-size:13px"><span>${m}</span><strong>${fmtWon(v)}</strong></div>
-          <div style="height:6px;background:var(--border-light);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--primary);border-radius:3px"></div></div>
-        </div>`;
+    <div style="padding:0 14px 14px;">
+      <div class="sec-title" style="margin-bottom:10px;">월별 매출 (${yr})</div>
+      ${Object.entries(mmap).sort().map(([m,v])=>{
+        const p=ySales>0?Math.round(v/ySales*100):0;
+        return `<div style="margin-bottom:10px;"><div class="row-between" style="margin-bottom:4px;font-size:13px;"><span>${m}</span><strong>${won(v)}</strong></div>
+        <div style="height:6px;background:var(--g7);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${p}%;background:var(--g3);border-radius:3px;"></div></div></div>`;
       }).join('')}
-      <div class="section-title" style="margin:16px 0 8px">이번달 서비스별</div>
-      ${svcList.map(([svc,v])=>`
-        <div class="flex-between" style="padding:8px 0;border-bottom:1px solid var(--border-light);font-size:14px">
-          <span>${svc}</span><strong>${fmtWon(v)}</strong>
-        </div>`).join('')}
+      <div class="sec-title" style="margin:16px 0 10px;">이번달 서비스별</div>
+      ${Object.entries(svcmap).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([s,v])=>`
+        <div style="padding:10px 0;border-bottom:1px solid #f0f4ef;display:flex;justify-content:space-between;font-size:14px;">
+          <span>${s}</span><strong>${won(v)}</strong></div>`).join('')}
     </div>`;
 }
 
-// =============================================
-// UNPAID
-// =============================================
+// ── UNPAID ──
 function openUnpaid() {
-  openPanel('unpaidPanel');
-  const bs = appData.bookings.filter(b=>b.payMethod==='unpaid'&&b.status!=='cancelled')
-    .sort((a,b)=>b.date.localeCompare(a.date));
-  const total = bs.reduce((s,b)=>s+(b.price||0),0);
-  document.getElementById('unpaidPanelBody').innerHTML = `
-    <div style="padding:14px;background:var(--accent-light);border-bottom:1px solid var(--border-light)">
-      <span style="font-weight:700;color:var(--danger)">총 미수금: ${fmtWon(total)}</span>
-      <span style="font-size:13px;color:var(--text-sub);margin-left:8px">${bs.length}건</span>
+  openPanel('pUnpaid');
+  const bs=D.bookings.filter(b=>b.payMethod==='unpaid'&&b.status!=='cancelled').sort((a,b)=>b.date?.localeCompare(a.date));
+  const total=bs.reduce((s,b)=>s+(b.price||0),0);
+  document.getElementById('pUnpaidBody').innerHTML=`
+    <div style="padding:14px;background:#fff3e0;border-bottom:1px solid #ffe0b2;">
+      <span style="font-weight:700;color:var(--orange)">총 미수금: ${won(total)}</span>
+      <span style="font-size:13px;color:var(--text3);margin-left:8px;">${bs.length}건</span>
     </div>
-    ${bs.length?bs.map(b=>`
-      <div class="list-item" onclick="openEditBooking('${b.id}')">
-        <div class="info">
-          <div class="name">${b.name} · ${b.date}</div>
-          <div class="sub">${b.service||''}</div>
-        </div>
-        <div class="right"><strong class="amount-negative">${fmtWon(b.price)}</strong></div>
-      </div>`).join(''):'<div class="empty-state"><p>미수금이 없습니다 🎉</p></div>'}`;
+    <div class="card" style="margin:14px;">${bs.length?bs.map(b=>`
+      <div class="li" onclick="openEditBooking('${b.id}')">
+        <div class="li-info"><div class="li-name">${b.name} · ${b.date}</div><div class="li-sub">${b.service||''}</div></div>
+        <strong style="color:var(--red);">${won(b.price)}</strong>
+      </div>`).join(''):'<div class="empty"><p>미수금이 없습니다 🎉</p></div>'}</div>`;
 }
 
-// =============================================
-// CLOSING
-// =============================================
+// ── CLOSING ──
 function openClosing() {
-  openPanel('closingPanel');
-  const today = todayStr();
-  const bs = appData.bookings.filter(b=>b.date===today&&b.status!=='cancelled');
-  const done = bs.filter(b=>b.status==='done');
-  const revenue = done.filter(b=>isRevenue(b)).reduce((s,b)=>s+(b.price||0),0);
-  const unpaid = done.filter(b=>b.payMethod==='unpaid').reduce((s,b)=>s+(b.price||0),0);
-  const byMethod = {};
-  done.filter(b=>isRevenue(b)&&b.payMethod!=='unpaid').forEach(b=>{ byMethod[b.payMethod]=(byMethod[b.payMethod]||0)+(b.price||0); });
-  document.getElementById('closingPanelBody').innerHTML = `
-    <div class="panel-body">
-      <div class="card" style="margin-bottom:12px">
-        <div class="section-title" style="margin-bottom:8px">📋 ${fmtDate(today)} 마감</div>
-        <div class="flex-between mb-8"><span>전체 예약</span><strong>${bs.length}건</strong></div>
-        <div class="flex-between mb-8"><span>완료</span><strong>${done.length}건</strong></div>
-        <div class="flex-between mb-8"><span>총 매출</span><strong class="amount-positive">${fmtWon(revenue)}</strong></div>
-        <div class="flex-between mb-8"><span>미수금</span><strong class="amount-negative">${fmtWon(unpaid)}</strong></div>
-        <div style="margin-top:10px;border-top:1px solid var(--border-light);padding-top:10px">
-          ${Object.entries(byMethod).map(([k,v])=>`
-            <div class="flex-between mb-8"><span>${{card:'카드',cash:'현금',transfer:'계좌이체'}[k]||k}</span><span>${fmtWon(v)}</span></div>`).join('')}
-        </div>
+  openPanel('pClosing');
+  const td=today();
+  const bs=D.bookings.filter(b=>b.date===td&&b.status!=='cancelled');
+  const done=bs.filter(b=>b.status==='done');
+  const rev=done.filter(b=>isRev(b)).reduce((s,b)=>s+(b.price||0),0);
+  const up=done.filter(b=>b.payMethod==='unpaid').reduce((s,b)=>s+(b.price||0),0);
+  const byM={};
+  done.filter(b=>isRev(b)&&b.payMethod!=='unpaid').forEach(b=>{ byM[b.payMethod]=(byM[b.payMethod]||0)+(b.price||0); });
+  document.getElementById('pClosingBody').innerHTML=`
+    <div class="card" style="padding:18px;margin-bottom:12px;">
+      <div class="sec-title" style="margin-bottom:12px;">📋 ${fdate(td)} 마감</div>
+      <div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">전체 예약</span><strong>${bs.length}건</strong></div>
+      <div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">완료</span><strong>${done.length}건</strong></div>
+      <div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">총 매출</span><strong style="color:var(--g2);">${won(rev)}</strong></div>
+      <div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">미수금</span><strong style="color:var(--red);">${won(up)}</strong></div>
+      <div style="border-top:1px solid #f0f4ef;margin-top:10px;padding-top:10px;">
+        ${Object.entries(byM).map(([k,v])=>`<div class="row-between mb8" style="margin-bottom:8px;"><span style="color:var(--text3)">${{card:'카드',cash:'현금',transfer:'계좌이체'}[k]||k}</span><span>${won(v)}</span></div>`).join('')}
       </div>
-      ${done.map(b=>`
-        <div class="list-item" style="background:var(--card);border-radius:10px;margin-bottom:6px">
-          <div class="info"><div class="name">${b.time||''} ${b.name}</div><div class="sub">${b.service||''}</div></div>
-          <div class="right"><span>${fmtWon(b.price)}</span></div>
-        </div>`).join('')}
-    </div>`;
+    </div>
+    <div class="card">${done.map(b=>`
+      <div class="li">
+        <div class="li-info"><div class="li-name">${b.time||''} ${b.name}</div><div class="li-sub">${b.service||''}</div></div>
+        <span>${won(b.price)}</span>
+      </div>`).join('')||'<div class="empty"><p>완료된 예약이 없습니다</p></div>'}</div>`;
 }
 
-// =============================================
-// BULK MSG
-// =============================================
-function updateBulkCount() {
-  const target = document.getElementById('bulkTarget').value;
-  let count = 0;
-  if (target==='all') count = appData.members.length;
-  else if (target==='ticket') count = [...new Set(appData.tickets.filter(t=>t.remaining>0).map(t=>t.memberId))].length;
-  else if (target==='recent') {
-    const m30ago = new Date(); m30ago.setDate(m30ago.getDate()-30);
-    const m30Str = m30ago.toISOString().slice(0,10);
-    count = appData.members.filter(m=>m.lastVisit&&m.lastVisit>=m30Str).length;
-  }
-  document.getElementById('bulkRecipientCount').textContent = `발송 대상: ${count}명`;
+// ── SERVICE PANEL ──
+function renderServicePanel() {
+  const el=document.getElementById('pServiceBody');
+  if (!D.services.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🛠</div><p>서비스가 없습니다</p></div>'; return; }
+  el.innerHTML=`<div class="card" style="margin:14px;">${D.services.map(s=>`
+    <div class="li" onclick="openEditServiceModal('${s.id}')">
+      <div class="li-info"><div class="li-name">${s.name}</div><div class="li-sub">${won(s.price)} · ${s.duration||0}분 ${s.category?'· '+s.category:''}</div></div>
+      <div class="mm-arr">›</div>
+    </div>`).join('')}</div>`;
+}
+function openServiceModal() { editSvid=null; document.getElementById('mServiceTitle').textContent='서비스 추가'; ['svName','svPrice','svDur','svCat'].forEach(id=>document.getElementById(id).value=''); document.getElementById('svDelWrap').style.display='none'; openModal('mService'); }
+function openEditServiceModal(id) {
+  const s=D.services.find(x=>x.id===id); if (!s) return;
+  editSvid=id; document.getElementById('mServiceTitle').textContent='서비스 수정';
+  document.getElementById('svName').value=s.name||''; document.getElementById('svPrice').value=s.price||'';
+  document.getElementById('svDur').value=s.duration||''; document.getElementById('svCat').value=s.category||'';
+  document.getElementById('svDelWrap').style.display='block'; openModal('mService');
+}
+async function saveService() {
+  const name=document.getElementById('svName').value.trim(); if (!name) return toast('서비스명을 입력해주세요',true);
+  const sv={id:editSvid||uid(), name, price:parseInt(document.getElementById('svPrice').value)||0, duration:parseInt(document.getElementById('svDur').value)||0, category:document.getElementById('svCat').value};
+  if (editSvid) { const i=D.services.findIndex(s=>s.id===editSvid); D.services[i]=sv; }
+  else D.services.push(sv);
+  await saveData(); closeModal('mService'); renderServicePanel(); toast('저장되었습니다');
+}
+async function deleteService() {
+  if (!editSvid||!confirm('서비스를 삭제하시겠습니까?')) return;
+  D.services=D.services.filter(s=>s.id!==editSvid);
+  await saveData(); closeModal('mService'); renderServicePanel(); toast('삭제되었습니다');
 }
 
-async function sendBulkMsg() {
-  const msg = document.getElementById('bulkMsg').value.trim();
-  if (!msg) return showToast('메시지를 입력해주세요', true);
-  const target = document.getElementById('bulkTarget').value;
-  let members = [];
-  if (target==='all') members = appData.members;
-  else if (target==='ticket') {
-    const ids = [...new Set(appData.tickets.filter(t=>t.remaining>0).map(t=>t.memberId))];
-    members = appData.members.filter(m=>ids.includes(m.id));
-  } else if (target==='recent') {
-    const m30ago = new Date(); m30ago.setDate(m30ago.getDate()-30);
-    const m30Str = m30ago.toISOString().slice(0,10);
-    members = appData.members.filter(m=>m.lastVisit&&m.lastVisit>=m30Str);
-  }
-  showToast(`${members.length}명에게 발송 중...`);
-  closeModal('modalBulkMsg');
+// ── SETTINGS ──
+function openSettingsModal() {
+  const s=D.settings;
+  document.getElementById('setShop').value=s.shopName||'라임스킨';
+  document.getElementById('setGoal').value=s.monthlyGoal||5000000;
+  document.getElementById('setKey').value=s.apiKey||'';
+  document.getElementById('setSec').value=s.apiSecret||'';
+  document.getElementById('setPhone').value=s.senderPhone||'';
+  openModal('mSettings');
+}
+async function saveSettings() {
+  D.settings.shopName=document.getElementById('setShop').value;
+  D.settings.monthlyGoal=parseInt(document.getElementById('setGoal').value)||5000000;
+  D.settings.apiKey=document.getElementById('setKey').value;
+  D.settings.apiSecret=document.getElementById('setSec').value;
+  D.settings.senderPhone=document.getElementById('setPhone').value;
+  await saveData(); closeModal('mSettings'); renderAll(); toast('설정이 저장되었습니다');
 }
 
-// =============================================
-// DATA MANAGEMENT
-// =============================================
+// ── DATA MANAGEMENT ──
 function exportJSON() {
-  const json = JSON.stringify(appData, null, 2);
-  const blob = new Blob([json], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `limeskin_${todayStr()}.json`;
-  a.click(); URL.revokeObjectURL(url);
+  const blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`limeskin_${today()}.json`; a.click();
+  URL.revokeObjectURL(url);
 }
-
 async function importJSON(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const text = await file.text();
+  const file=e.target.files[0]; if (!file) return;
   try {
-    const data = JSON.parse(text);
+    const text=await file.text();
+    const data=JSON.parse(text);
     if (!confirm('기존 데이터를 모두 덮어쓰시겠습니까?')) return;
-    appData = { ...appData, ...data };
-    await saveData();
-    renderAll();
-    showToast('데이터가 복원되었습니다');
-  } catch(err) { showToast('파일 형식이 올바르지 않습니다', true); }
-  e.target.value = '';
+    D={...D,...data};
+    await saveData(); renderAll(); toast('데이터가 복원되었습니다');
+  } catch(err) { toast('파일 형식이 올바르지 않습니다',true); }
+  e.target.value='';
+}
+async function resetData() {
+  if (!confirm('모든 데이터를 삭제합니까?')||!confirm('정말로 삭제합니까? 되돌릴 수 없습니다.')) return;
+  D={...D, members:[], bookings:[], tickets:[], ticketHistory:[], services:[]};
+  await saveData(); renderAll(); toast('초기화 완료');
 }
 
-async function resetAllData() {
-  if (!confirm('모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
-  if (!confirm('정말로 삭제하시겠습니까? 마지막 확인입니다.')) return;
-  appData = { members:[], bookings:[], tickets:[], ticketHistory:[], services:[], settings: appData.settings };
-  await saveData();
-  renderAll();
-  showToast('초기화 완료');
-}
-
-// =============================================
-// MODAL HELPERS
-// =============================================
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
-
-// close modal on overlay click
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', function(e) {
-    if (e.target === this) closeModal(this.id);
-  });
-});
-
-// close dropdowns on outside click
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('#memberSelectWrap')) {
-    document.getElementById('memberSelectDropdown')?.classList.add('hidden');
-  }
-  if (!e.target.closest('#serviceSelectWrap')) {
-    document.getElementById('serviceSelectDropdown')?.classList.add('hidden');
-  }
-  if (!e.target.closest('#ticketMemberSelectWrap')) {
-    document.getElementById('ticketMemberSelectDropdown')?.classList.add('hidden');
-  }
-});
-
-// =============================================
-// PUSH NOTIFICATIONS
-// =============================================
-async function setupNotifications() {
+// ── SW / NOTIFICATIONS ──
+async function setupSW() {
   if (!('serviceWorker' in navigator)) return;
   try {
     await navigator.serviceWorker.register('/sw.js');
-    const perm = await Notification.requestPermission();
-    if (perm !== 'granted') return;
-    scheduleEightAMNotification();
-  } catch(e) {}
+    const perm=await Notification.requestPermission();
+    if (perm!=='granted') return;
+    scheduleNotif();
+  } catch(e){}
 }
-
-function scheduleEightAMNotification() {
-  const now = new Date();
-  // KST 오전 8시 = UTC 전날 23:00
-  const target = new Date();
-  target.setUTCHours(23, 0, 0, 0);
-  if (now >= target) target.setUTCDate(target.getUTCDate() + 1);
-  const delay = target - now;
-
-  navigator.serviceWorker.ready.then(sw => {
-    const today = todayStr();
-    const count = appData.bookings.filter(b=>b.date===today&&b.status!=='cancelled').length;
-    setTimeout(() => {
-      sw.active?.postMessage({
-        type: 'SCHEDULE_NOTIFICATION',
-        title: '라임스킨 오늘 예약',
-        body: `오늘 예약 ${count}건이 있습니다`,
-        delay: 0
-      });
-    }, delay);
+function scheduleNotif() {
+  const now=new Date();
+  const target=new Date(); target.setUTCHours(23,0,0,0); // KST 08:00
+  if (now>=target) target.setUTCDate(target.getUTCDate()+1);
+  const delay=target-now;
+  navigator.serviceWorker.ready.then(sw=>{
+    const cnt=D.bookings.filter(b=>b.date===today()&&b.status!=='cancelled').length;
+    setTimeout(()=>{ sw.active?.postMessage({type:'SCHEDULE_NOTIFICATION',title:'라임스킨 오늘 예약',body:`오늘 예약 ${cnt}건이 있습니다`,delay:0}); }, delay);
   });
 }
 
-// =============================================
-// INIT
-// =============================================
 window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
