@@ -10,7 +10,6 @@ module.exports = async function handler(req, res) {
   const token = process.env.KV_REST_API_TOKEN;
 
   if (!url || !token) {
-    console.error('[sync] 환경변수 없음 - KV_REST_API_URL:', url);
     return res.status(500).json({ ok: false, error: '환경변수 없음' });
   }
 
@@ -18,10 +17,11 @@ module.exports = async function handler(req, res) {
     const { bookings, members, settings } = req.body || {};
     const value = JSON.stringify({ bookings: bookings||[], members: members||[], settings: settings||{} });
 
-    const r = await fetch(`${url}/set/limeskin_data`, {
+    // Upstash REST API: POST /pipeline 으로 SET 명령
+    const r = await fetch(`${url}/pipeline`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ value })
+      body: JSON.stringify([["SET", "limeskin_data", value]])
     });
     const data = await r.json();
     console.log('[sync] 저장결과:', JSON.stringify(data));

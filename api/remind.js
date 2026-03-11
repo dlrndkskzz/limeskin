@@ -47,7 +47,11 @@ module.exports = async function handler(req, res) {
 
     if (!json.result) return res.status(200).json({ ok: true, message: '데이터 없음' });
 
-    const data     = typeof json.result === 'string' ? JSON.parse(json.result) : json.result;
+    // 이중 JSON 파싱 처리
+    let raw = json.result;
+    if (typeof raw === 'string') raw = JSON.parse(raw);
+    if (typeof raw === 'object' && raw.value) raw = typeof raw.value === 'string' ? JSON.parse(raw.value) : raw.value;
+    const data = raw;
     const bookings = data.bookings || [];
     const members  = data.members  || [];
     const tomorrow = tomorrowKST();
