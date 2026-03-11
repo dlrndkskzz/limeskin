@@ -998,40 +998,61 @@ function saveData() {
     settings: settings
   };
   localStorage.setItem('limeskin_v3', JSON.stringify(d));
-  // 서버 동기화 (Cron 리마인드용)
+  // Redis 동기화 (PC/폰 공유)
   try {
-    fetch('/api/sync', {
+    fetch('/api/data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookings: bookings, members: members, settings: settings })
+      body: JSON.stringify(d)
     }).catch(function(){});
   } catch(e) {}
 }
 
-function loadData() {
-  var raw = localStorage.getItem('limeskin_v3');
-  if (raw) {
-    try {
-      var d = JSON.parse(raw);
-      members = d.members || [];
-      bookings = d.bookings || [];
-      tickets = d.tickets || [];
-      ticketHistory = d.ticketHistory || [];
-      services = d.services || [];
-      settings = d.settings || {};
-    } catch(e) {
-      members=[];bookings=[];tickets=[];ticketHistory=[];services=[];settings={};
-    }
-  }
-  // 기본 설정 병합
+function applyData(d) {
+  members      = d.members      || [];
+  bookings     = d.bookings     || [];
+  tickets      = d.tickets      || [];
+  ticketHistory= d.ticketHistory|| [];
+  services     = d.services     || [];
+  settings     = d.settings     || {};
   if (!settings.shopName) settings.shopName = '라임스킨';
   if (!settings.monthlyGoal) settings.monthlyGoal = 0;
   if (!settings.notifiedTickets) settings.notifiedTickets = [];
-  // 솔라피 기본값 (설정에 없으면 하드코딩값 사용)
   if (!settings.apiKey) settings.apiKey = SOLAPY_API_KEY;
   if (!settings.apiSecret) settings.apiSecret = SOLAPY_API_SECRET;
-  // 항상 최신 PFID로 강제 업데이트
   settings.senderKey = SOLAPY_PFID;
+}
+
+function loadData() {
+  // localStorage 먼저 (빠른 초기 렌더링)
+  var raw = localStorage.getItem('limeskin_v3');
+  if (raw) {
+    try { applyData(JSON.parse(raw)); } catch(e) {}
+  }
+  applyData({ members:members, bookings:bookings, tickets:tickets,
+    ticketHistory:ticketHistory, services:services, settings:settings });
+
+  // Redis에서 최신 데이터 불러오기
+  fetch('/api/data')
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if (res.ok && res.data) {
+        // Redis 데이터가 localStorage보다 최신이면 적용
+        var redisTime = res.data.updatedAt || '';
+        var localRaw = localStorage.getItem('limeskin_v3');
+        var localTime = '';
+        try { localTime = JSON.parse(localRaw).settings && JSON.parse(localRaw).settings.updatedAt || ''; } catch(e){}
+        // updatedAt 비교 또는 무조건 Redis 우선
+        applyData(res.data);
+        localStorage.setItem('limeskin_v3', JSON.stringify(res.data));
+        renderHome();
+        renderBookings();
+        renderMembers();
+        renderTickets();
+        showToast('☁️ 최신 데이터 불러옴');
+      }
+    })
+    .catch(function(){ /* Redis 실패시 localStorage 사용 */ });
 }
 
 // ============================================================
