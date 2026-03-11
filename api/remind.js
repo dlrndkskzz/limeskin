@@ -1,92 +1,87 @@
-// api/remind.js
+// api/remind.js - Vercel Cron: 매일 UTC 06:00 (KST 15:00) 실행 → 내일 예약 리마인드 발송
 const crypto = require('crypto');
 
-const API_KEY    = process.env.SOLAPI_API_KEY    || 'NCSN84FMPLK0ZRJV';
-const API_SECRET = process.env.SOLAPI_API_SECRET || 'I7TAN3PP8A0JOCPYFFM5B4XEN0SHNTYL';
+const KV_URL = process.env.KV_REST_API_URL;
+const KV_TOKEN = process.env.KV_REST_API_TOKEN;
+const CRON_SECRET = process.env.CRON_SECRET || 'limeskin2026';
+
+const API_KEY = process.env.SOLAPI_API_KEY || 'NCSN84FMPLK0ZRJV';
+const API_SECRET_KEY = process.env.SOLAPI_API_SECRET || 'I7TAN3PP8A0JOCPYFFM5B4XEN0SHNTYL';
+const PFID = process.env.SOLAPI_PFID || 'KA01PF260303011802344MukuvkKjzXI';
+const SENDER_PHONE = process.env.SOLAPI_SENDER_PHONE || '01032057451';
 const TPL_REMIND = 'KA01TP260303085208365I0uoVbWPhTo';
-const PFID       = 'KA01PF260303011802344MukuvkKjzXI';
-const FROM_PHONE = '01032057451';
 
-function makeSignature() {
+function getSignature(date) {
+  const salt = crypto.randomBytes(32).toString('hex');
+  const message = date + salt;
+  const hmac = crypto.createHmac('sha256', API_SECRET_KEY);
+  hmac.update(message);
+  const signature = hmac.digest('hex');
+  return { salt, signature };
+}
+
+async function sendAlimtalk(to, templateId, variables) {
   const date = new Date().toISOString();
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hmac = crypto.createHmac('sha256', API_SECRET);
-  hmac.update(date + salt);
-  return `HMAC-SHA256 apiKey=${API_KEY}, date=${date}, salt=${salt}, signature=${hmac.digest('hex')}`;
+  const { salt, signature } = getSignature(date);
+  await fetch('https://api.solapi.com/messages/v4/send', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `HMAC-SHA256 apiKey=${API_KEY}, date=${date}, salt=${salt}, signature=${signature}`
+    },
+    body: JSON.stringify({
+      message: {
+        to, from: SENDER_PHONE,
+        kakaoOptions: { pfId: PFID, templateId, variables, disableSms: true }
+      }
+    })
+  });
 }
 
-function tomorrowKST() {
-  const d = new Date();
-  d.setHours(d.getHours() + 9);
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().slice(0, 10);
+async function redisGet(key) {
+  const res = await fetch(`${KV_URL}/get/${key}`, {
+    headers: { Authorization: `Bearer ${KV_TOKEN}` }
+  });
+  const data = await res.json();
+  return data.result;
 }
 
-module.exports = async function handler(req, res) {
-  const auth = req.headers['authorization'];
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  const url   = process.env.KV_REST_API_URL;
-  const token = process.env.KV_REST_API_TOKEN;
-
-  console.log('[remind] KV_REST_API_URL:', url ? url.slice(0,30)+'...' : '없음');
-
-  if (!url || !token) {
-    return res.status(500).json({ ok: false, error: 'KV 환경변수 없음' });
-  }
+module.exports = async (req, res) => {
+  const secret = req.headers['x-cron-secret'] || req.query.secret;
+  if (secret !== CRON_SECRET) return res.status(401).json({ error: 'Unauthorized' });
 
   try {
-    // Redis에서 데이터 읽기 (fetch 직접 사용)
-    const r = await fetch(`${url}/get/limeskin_data`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const json = await r.json();
-    console.log('[remind] Redis 응답:', JSON.stringify(json).slice(0, 100));
+    const raw = await redisGet('limeskin_alldata');
+    if (!raw) return res.status(200).json({ message: 'No data' });
+    const appData = typeof raw === 'string' ? JSON.parse(raw) : raw;
 
-    if (!json.result) return res.status(200).json({ ok: true, message: '데이터 없음' });
+    const { bookings = [], members = [], settings = {} } = appData;
 
-    // 이중 JSON 파싱 처리
-    let raw = json.result;
-    if (typeof raw === 'string') raw = JSON.parse(raw);
-    if (typeof raw === 'object' && raw.value) raw = typeof raw.value === 'string' ? JSON.parse(raw.value) : raw.value;
-    const data = raw;
-    const bookings = data.bookings || [];
-    const members  = data.members  || [];
-    const tomorrow = tomorrowKST();
+    // 내일 날짜 (KST 기준)
+    const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
+    const tomorrow = new Date(kstNow);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().slice(0, 10);
 
-    const targets = bookings.filter(b => b.date === tomorrow && b.status !== 'cancelled');
-    console.log('[remind] 내일:', tomorrow, '발송대상:', targets.length);
+    const tomorrowBookings = bookings.filter(b =>
+      b.date === tomorrowStr && ['pending', 'confirmed'].includes(b.status)
+    );
 
-    const results = [];
-    for (const b of targets) {
-      let phone = (b.phone || '').replace(/-/g, '');
-      if (!phone && b.memberId) {
-        const m = members.find(x => x.id === b.memberId);
-        if (m) phone = (m.phone || '').replace(/-/g, '');
-      }
-      if (!phone) continue;
-
-      const variables = { '#{고객명}': b.name||'', '#{시간}': b.time||'', '#{서비스}': b.service||'' };
-      const text = `${b.name||''}님, 내일 예약이 있습니다 🔔\n\n📅 내일 ${b.time||''}\n✨ 시술: ${b.service||''}\n\n📞 010-3205-7451\n📍 라임스킨 목동서로213 404호`;
-
-      const body = { message: { to: phone, from: FROM_PHONE, type: 'ATA', text,
-        kakaoOptions: { pfId: PFID, templateId: TPL_REMIND, variables, disableSms: true } } };
-
-      const sr = await fetch('https://api.solapi.com/messages/v4/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: makeSignature() },
-        body: JSON.stringify(body)
-      });
-      const sd = await sr.json();
-      console.log('[remind 발송]', b.name, phone, JSON.stringify(sd));
-      results.push({ name: b.name, phone, ok: !sd.errorCode });
+    let sent = 0;
+    for (const b of tomorrowBookings) {
+      if (!b.phone) continue;
+      const variables = {
+        '#{고객명}': b.name || '',
+        '#{시간}': b.time || '',
+        '#{서비스}': b.service || ''
+      };
+      await sendAlimtalk(b.phone, TPL_REMIND, variables);
+      sent++;
     }
 
-    return res.status(200).json({ ok: true, tomorrow, sent: results.length, results });
+    return res.status(200).json({ success: true, sent, date: tomorrowStr });
   } catch (err) {
-    console.error('[리마인드 오류]', err);
-    return res.status(500).json({ ok: false, error: err.message });
+    console.error('remind error:', err);
+    return res.status(500).json({ error: err.message });
   }
 };

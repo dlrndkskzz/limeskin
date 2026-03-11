@@ -1,21 +1,21 @@
-// api/alimtalk.js
-// Vercel Serverless Function - 솔라피 알림톡 단건 발송 (HMAC-SHA256)
-
+// api/alimtalk.js - 솔라피 알림톡 발송 (HMAC-SHA256 인증)
 const crypto = require('crypto');
 
-const API_KEY    = process.env.SOLAPI_API_KEY    || 'NCSN84FMPLK0ZRJV';
+const API_KEY = process.env.SOLAPI_API_KEY || 'NCSN84FMPLK0ZRJV';
 const API_SECRET = process.env.SOLAPI_API_SECRET || 'I7TAN3PP8A0JOCPYFFM5B4XEN0SHNTYL';
+const PFID = process.env.SOLAPI_PFID || 'KA01PF260303011802344MukuvkKjzXI';
+const SENDER_PHONE = process.env.SOLAPI_SENDER_PHONE || '01032057451';
 
-function makeSignature() {
-  const date      = new Date().toISOString();
-  const salt      = crypto.randomBytes(16).toString('hex');
-  const hmac      = crypto.createHmac('sha256', API_SECRET);
-  hmac.update(date + salt);
+function getSignature(date) {
+  const salt = crypto.randomBytes(32).toString('hex');
+  const message = date + salt;
+  const hmac = crypto.createHmac('sha256', API_SECRET);
+  hmac.update(message);
   const signature = hmac.digest('hex');
-  return `HMAC-SHA256 apiKey=${API_KEY}, date=${date}, salt=${salt}, signature=${signature}`;
+  return { salt, signature };
 }
 
-module.exports = async function handler(req, res) {
+module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -24,78 +24,43 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const body = req.body;
-    const msg  = body && body.messages && body.messages[0];
+    const { to, templateId, variables } = req.body;
+    if (!to || !templateId) return res.status(400).json({ error: 'Missing required fields' });
 
-    if (!msg)       return res.status(400).json({ ok: false, errorMessage: '메시지가 없습니다.' });
-    if (!msg.to)    return res.status(400).json({ ok: false, errorMessage: '수신번호(to)가 없습니다.' });
-    if (!msg.from)  return res.status(400).json({ ok: false, errorMessage: '발신번호(from)가 없습니다. 업체 설정에서 발신 전화번호를 저장하세요.' });
+    const date = new Date().toISOString();
+    const { salt, signature } = getSignature(date);
 
-    // ── 변수 키를 #{변수명} 형식으로 변환 (카카오 알림톡 규격) ──
-    const rawVars   = (msg.kakaoOptions && msg.kakaoOptions.variables) || {};
-    const variables = {};
-    Object.keys(rawVars).forEach(function(k) {
-      const key = (k.startsWith('#{') && k.endsWith('}')) ? k : ('#{' + k + '}');
-      variables[key] = rawVars[k];
-    });
-
-    // ── 단건 발송 엔드포인트 사용 ─────────────────────────────
-    // disableSms: true → 알림톡 실패 시 LMS 대체발송 OFF
-    const solapiPayload = {
+    const payload = {
       message: {
-        to:          msg.to,
-        from:        msg.from,
-        type:        'ATA',
-        text:        msg.text || '',
+        to,
+        from: SENDER_PHONE,
         kakaoOptions: {
-          pfId:        (msg.kakaoOptions && msg.kakaoOptions.pfId)       || '',
-          templateId:  (msg.kakaoOptions && msg.kakaoOptions.templateId) || '',
-          variables:   variables,
-          disableSms:  true
+          pfId: PFID,
+          templateId,
+          variables: variables || {},
+          disableSms: true
         }
       }
     };
 
-    console.log('[솔라피 요청]', JSON.stringify(solapiPayload));
-    console.log('[변수 매핑]', JSON.stringify(variables));
-
-    const solapiRes = await fetch('https://api.solapi.com/messages/v4/send', {
+    const response = await fetch('https://api.solapi.com/messages/v4/send', {
       method: 'POST',
       headers: {
-        'Content-Type':  'application/json',
-        'Authorization': makeSignature(),
+        'Content-Type': 'application/json',
+        'Authorization': `HMAC-SHA256 apiKey=${API_KEY}, date=${date}, salt=${salt}, signature=${signature}`
       },
-      body: JSON.stringify(solapiPayload),
+      body: JSON.stringify(payload)
     });
 
-    const data = await solapiRes.json();
-    console.log('[솔라피 응답]', JSON.stringify(data));
-
-    // 솔라피는 HTTP 200이어도 내부 failedMessageList에 오류를 담을 수 있음
-    const failed = data.failedMessageList && data.failedMessageList[0];
-    if (failed) {
-      return res.status(200).json({
-        ok:           false,
-        errorCode:    failed.errorCode,
-        errorMessage: failed.errorMessage || '알림톡 발송 실패',
-        raw:          data,
-      });
+    const data = await response.json();
+    if (!response.ok) {
+      console.error('Solapi error:', data);
+      return res.status(500).json({ error: data.errorMessage || 'Solapi error', detail: data });
     }
 
-    // HTTP 오류 또는 최상위 errorCode
-    if (!solapiRes.ok || data.errorCode) {
-      return res.status(200).json({
-        ok:           false,
-        errorCode:    data.errorCode,
-        errorMessage: data.errorMessage || '알림톡 발송 실패',
-        raw:          data,
-      });
-    }
-
-    return res.status(200).json({ ok: true, data });
-
+    return res.status(200).json({ success: true, data });
   } catch (err) {
-    console.error('[서버 오류]', err);
-    return res.status(500).json({ ok: false, errorMessage: err.message });
+    console.error('alimtalk error:', err);
+    return res.status(500).json({ error: err.message });
   }
 };
