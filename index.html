@@ -990,6 +990,8 @@ function recalcAllMemberStats() {
 // 데이터 저장/로드
 // ============================================================
 function saveData() {
+  var now = new Date().toISOString();
+  settings.updatedAt = now;
   var d = {
     members: members,
     bookings: bookings,
@@ -1025,13 +1027,36 @@ function applyData(d) {
 }
 
 function loadData() {
-  // localStorage 우선 (빠르고 안전)
+  // localStorage 먼저 (빠른 초기 렌더링)
   var raw = localStorage.getItem('limeskin_v3');
   if (raw) {
     try { applyData(JSON.parse(raw)); } catch(e) {}
   }
   applyData({ members:members, bookings:bookings, tickets:tickets,
     ticketHistory:ticketHistory, services:services, settings:settings });
+
+  // Redis에서 최신 데이터 확인 (더 최신이면 적용)
+  fetch('/api/data')
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if (!res.ok || !res.data) return;
+      var redisData = res.data;
+      // 빈 데이터 보호: members가 0명이면 무시
+      if ((redisData.members||[]).length === 0 && members.length > 0) return;
+      // updatedAt 비교: Redis가 더 최신이면 적용
+      var redisTime = (redisData.settings||{}).updatedAt || '';
+      var localTime = settings.updatedAt || '';
+      if (redisTime > localTime) {
+        applyData(redisData);
+        localStorage.setItem('limeskin_v3', JSON.stringify(redisData));
+        renderHome();
+        renderBookings();
+        renderMembers();
+        renderTickets();
+        showToast('☁️ 동기화 완료');
+      }
+    })
+    .catch(function(){});
 }
 
 // ============================================================
