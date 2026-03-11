@@ -1,31 +1,59 @@
-// sw.js - Service Worker: 오전 8시 오늘 예약 푸시 알림
-self.addEventListener('install', e => self.skipWaiting());
-self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+/**
+ * sw.js — Service Worker
+ * 매일 오전 8시 오늘 예약 요약 푸시 알림
+ */
 
-// 푸시 수신
-self.addEventListener('push', e => {
-  const data = e.data ? e.data.json() : {};
-  e.waitUntil(
-    self.registration.showNotification(data.title || '라임스킨', {
-      body: data.body || '',
-      icon: '/icon-192.png',
-      badge: '/icon-96.png',
-      data: data.url || '/'
+const CACHE_NAME = 'limeskin-v1';
+
+// ── 설치 ───────────────────────────────────────────────────────
+self.addEventListener('install', event => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(self.clients.claim());
+});
+
+// ── 푸시 수신 ──────────────────────────────────────────────────
+self.addEventListener('push', event => {
+  const data = event.data?.json() || {};
+  const title   = data.title   || '라임스킨 🌿';
+  const body    = data.body    || '오늘 예약을 확인해주세요';
+  const options = {
+    body,
+    icon:  '/icon-192.png',
+    badge: '/icon-192.png',
+    tag:   'limeskin-daily',
+    renotify: true,
+    data: { url: '/' },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// ── 알림 클릭 → 앱 열기 ────────────────────────────────────────
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) return clients.openWindow('/');
     })
   );
 });
 
-self.addEventListener('notificationclick', e => {
-  e.notification.close();
-  e.waitUntil(clients.openWindow(e.notification.data || '/'));
-});
-
-// 매일 오전 8시 로컬 예약 알림 (클라이언트가 메시지로 스케줄 전달)
-self.addEventListener('message', e => {
-  if (e.data && e.data.type === 'SCHEDULE_NOTIFICATION') {
-    const { title, body, delay } = e.data;
-    setTimeout(() => {
-      self.registration.showNotification(title, { body, icon: '/icon-192.png' });
-    }, delay);
+// ── 매일 오전 8시 알림 스케줄 (앱에서 setInterval로 호출) ─────
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SCHEDULE_DAILY') {
+    const { title, body } = event.data;
+    self.registration.showNotification(title || '라임스킨 🌿', {
+      body:     body || '오늘 예약을 확인해주세요',
+      icon:     '/icon-192.png',
+      tag:      'limeskin-daily',
+      renotify: true,
+    });
   }
 });
