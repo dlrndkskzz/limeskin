@@ -1,32 +1,31 @@
-// sw.js - 라임스킨 Service Worker
-var CACHE = 'limeskin-v5';
+// sw.js - Service Worker: 오전 8시 오늘 예약 푸시 알림
+self.addEventListener('install', e => self.skipWaiting());
+self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 
-self.addEventListener('install', function(e) {
-  self.skipWaiting();
-  // 기존 캐시 모두 삭제
+// 푸시 수신
+self.addEventListener('push', e => {
+  const data = e.data ? e.data.json() : {};
   e.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(keys.map(function(key) {
-        return caches.delete(key);
-      }));
+    self.registration.showNotification(data.title || '라임스킨', {
+      body: data.body || '',
+      icon: '/icon-192.png',
+      badge: '/icon-96.png',
+      data: data.url || '/'
     })
   );
 });
 
-self.addEventListener('activate', function(e) {
-  e.waitUntil(clients.claim());
-});
-
-// 캐시 안 쓰고 항상 네트워크에서 최신 버전 가져오기
-self.addEventListener('fetch', function(e) {
-  e.respondWith(
-    fetch(e.request).catch(function() {
-      return caches.match(e.request);
-    })
-  );
-});
-
-self.addEventListener('notificationclick', function(e) {
+self.addEventListener('notificationclick', e => {
   e.notification.close();
-  e.waitUntil(clients.openWindow('/'));
+  e.waitUntil(clients.openWindow(e.notification.data || '/'));
+});
+
+// 매일 오전 8시 로컬 예약 알림 (클라이언트가 메시지로 스케줄 전달)
+self.addEventListener('message', e => {
+  if (e.data && e.data.type === 'SCHEDULE_NOTIFICATION') {
+    const { title, body, delay } = e.data;
+    setTimeout(() => {
+      self.registration.showNotification(title, { body, icon: '/icon-192.png' });
+    }, delay);
+  }
 });
