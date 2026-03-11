@@ -1035,26 +1035,25 @@ function loadData() {
   applyData({ members:members, bookings:bookings, tickets:tickets,
     ticketHistory:ticketHistory, services:services, settings:settings });
 
-  // Redis에서 최신 데이터 확인 (더 최신이면 적용)
+  // Redis에서 최신 데이터 확인
   fetch('/api/data')
     .then(function(r){ return r.json(); })
     .then(function(res){
       if (!res.ok || !res.data) return;
       var redisData = res.data;
-      // 빈 데이터 보호: members가 0명이면 무시
-      if ((redisData.members||[]).length === 0 && members.length > 0) return;
-      // updatedAt 비교: Redis가 더 최신이면 적용
       var redisTime = (redisData.settings||{}).updatedAt || '';
       var localTime = settings.updatedAt || '';
-      if (redisTime > localTime) {
-        applyData(redisData);
-        localStorage.setItem('limeskin_v3', JSON.stringify(redisData));
-        renderHome();
-        renderBookings();
-        renderMembers();
-        renderTickets();
-        showToast('☁️ 동기화 완료');
-      }
+      // 빈 데이터 보호: Redis 회원이 0명인데 로컬에 있으면 무시
+      if ((redisData.members||[]).length === 0 && members.length > 0) return;
+      // updatedAt 둘다 있으면 시간 비교, 하나라도 없으면 Redis 적용
+      if (localTime && redisTime && localTime > redisTime) return;
+      applyData(redisData);
+      localStorage.setItem('limeskin_v3', JSON.stringify(redisData));
+      renderHome();
+      renderBookings();
+      renderMembers();
+      renderTickets();
+      showToast('☁️ 동기화 완료');
     })
     .catch(function(){});
 }
